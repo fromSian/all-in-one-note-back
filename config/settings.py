@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -147,7 +151,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    "DEFAULT_PAGINATION_CLASS": "pagination.CustomPagination",
+    "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
 }
 
@@ -166,3 +170,10 @@ SWAGGER_SETTINGS = {
     },
     "LOGIN_URL": "accounts/login",
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]

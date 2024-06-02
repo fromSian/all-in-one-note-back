@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -42,6 +42,7 @@ urlpatterns = [
     path(
         "swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-redoc"
     ),
+    path("", include("account.urls")),
 ]
 
 
