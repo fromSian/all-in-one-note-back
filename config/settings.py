@@ -171,9 +171,20 @@ SWAGGER_SETTINGS = {
     "LOGIN_URL": "accounts/login",
 }
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#   ssl:465/994 nossl:25
+
+EMAIL_HOST = "smtp.163.com"
+EMAIL_PORT = 25
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = "notetodos@163.com"
+EMAIL_HOST_PASSWORD = "YFBRQNDXULLRFQCV"
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+
+ADMINS = [("notes & todos", "notetodos@163.com")]

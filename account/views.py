@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.renderers import BrowsableAPIRenderer
+from django.core.mail import send_mail
 
 # Create your views here.
 
@@ -35,6 +36,14 @@ code: using ras encryption
 @renderer_classes([BrowsableAPIRenderer])
 def send_vetification_code(request):
     try:
+        send_mail(
+            subject="notes & todos 😺",
+            message="Here is the message.",
+            from_email="notetodos@163.com",
+            recipient_list=["fromsian@163.com"],
+            fail_silently=False,
+        )
+        print("successfully sentvetification")
         return Response(
             {
                 "success": True,
@@ -42,10 +51,9 @@ def send_vetification_code(request):
             status=status.HTTP_200_OK,
         )
     except Exception as e:
+        print("fail", e)
         return Response(
-            {
-                "sucess": False,
-            },
+            {"success": False, "message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
