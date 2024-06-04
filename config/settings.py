@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_yasg",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     # local application
     "account",
 ]
@@ -171,7 +172,7 @@ SWAGGER_SETTINGS = {
     "LOGIN_URL": "accounts/login",
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 #   ssl:465/994 nossl:25
 
 EMAIL_HOST = "smtp.163.com"
@@ -186,5 +187,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis-17938.c56.east-us.azure.redns.redis-cloud.com:17938",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "DB": "cache-LX0NU332",
+            "PASSWORD": "MsKFFHE4r8Yiu0C7ldOi6JV7AAcBLUUs",
+        },
+    }
+}
 
 ADMINS = [("notes & todos", "notetodos@163.com")]

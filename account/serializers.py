@@ -4,7 +4,7 @@ from .models import User
 from django.contrib.auth.models import Group
 
 
-class RegisterSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
+class UserSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = User

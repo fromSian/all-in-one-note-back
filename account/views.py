@@ -1,19 +1,24 @@
-from django.shortcuts import render
-from rest_framework import viewsets
 from .models import User
-from .serializers import RegisterSerializer
+from .serializers import UserSerializer
+
+from rest_framework import viewsets
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.renderers import BrowsableAPIRenderer
+
 from django.core.mail import send_mail
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import authenticate
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 # Create your views here.
 
@@ -59,8 +64,7 @@ def register(request):
     try:
         data = request.data
 
-
-        serializer = RegisterSerializer(data=data)
+        serializer = UserSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
@@ -137,7 +141,7 @@ def send_vertification_code(request):
         email = request.data.get("email")
         code = request.data.get("code")
         if email is None or code is None:
-            raise Exception("email or code is None")
+            raise ValidationError("email or code is None")
         email_validator(email)
         code_validator(code)
         send_mail(
@@ -167,6 +171,51 @@ log in
 """
 
 
+@swagger_auto_schema(
+    method="POST",
+    operation_description="log in with email and password",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["email", "password"],
+        properties={
+            "email": openapi.Schema(
+                type=openapi.TYPE_STRING, description="email address"
+            ),
+            "password": openapi.Schema(
+                type=openapi.TYPE_STRING, description="password"
+            ),
+        },
+    ),
+    responses={
+        status.HTTP_202_ACCEPTED: "success",
+        status.HTTP_400_BAD_REQUEST: "fail",
+    },
+)
+@api_view(["POST"])
+def login(request):
+    try:
+        user_data = request.data
+        user = authenticate(username=user_data["email"], password=user_data["password"])
+        # if not user or not user.groups.values("name").filter(name="普通用户").exists():
+        #     raise ValidationError("用户名或密码错误")
+        serializer = UserSerializer(user)
+        jwt_token = RefreshToken.for_user(user)
+        serializer_data = serializer.data
+        print(jwt_token)
+        serializer_data["token"] = {
+            "access_token": str(jwt_token.access_token),
+            "refresh_token": str(jwt_token),
+        }
+        return Response(
+            {"status": True, "message": "登录成功", **serializer_data},
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+    except Exception as e:
+        return Response(
+            {"status": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST
+        )
+
 
 """
 log out
@@ -188,4 +237,5 @@ change avatar
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = RegisterSerializer
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
