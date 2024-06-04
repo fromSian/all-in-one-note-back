@@ -6,7 +6,7 @@ from . import views
 single_views = [
     {
         "route": "send-vertification-code/",
-        "view": views.send_vetification_code,
+        "view": views.send_vertification_code,
         "name": "send-vetification-code",
     },
 ]

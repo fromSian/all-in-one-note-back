@@ -79,7 +79,7 @@ def code_validator(value):
     },
 )
 @api_view(["POST"])
-def send_vetification_code(request):
+def send_vertification_code(request):
     try:
         email = request.data.get("email")
         code = request.data.get("code")
