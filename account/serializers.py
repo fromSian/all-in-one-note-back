@@ -8,4 +8,5 @@ class RegisterSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
-        encrypt_fields = ("password", )
+        encrypt_fields = ("password",)
+
