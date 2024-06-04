@@ -78,7 +78,7 @@ class EncryptSerializerMixin(RSAEncryption):
 
     def to_internal_value(self, data):
 
-        field_list = self._get_encrypt_fields(data.dict())
+        field_list = self._get_encrypt_fields(data)
         if field_list is None:
             return super().to_internal_value(data)
 

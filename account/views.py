@@ -28,6 +28,59 @@ password: using ras encryption
 
 """
 
+
+@swagger_auto_schema(
+    method="POST",
+    operation_description="register a new user with emial and password",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["email", "password"],
+        properties={
+            "email": openapi.Schema(
+                type=openapi.TYPE_STRING, description="to email address"
+            ),
+            "password": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="password",
+            ),
+        },
+    ),
+    responses={
+        status.HTTP_201_CREATED: openapi.Response(
+            "success", examples={"success": True, "message": "success"}
+        ),
+        status.HTTP_400_BAD_REQUEST: openapi.Response(
+            "fail", examples={"success": False, "message": "fail"}
+        ),
+    },
+)
+@api_view(["POST"])
+def register(request):
+    try:
+        data = request.data
+
+
+        serializer = RegisterSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={"success": True, "message": "registered"},
+                status=status.HTTP_201_CREATED,
+            )
+        else:
+            return Response(
+                data={"success": False, "message": serializer.error_messages},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except Exception as e:
+        print(e)
+        return Response(
+            data={"success": False, "message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
 """
 
 send email validation code
@@ -112,6 +165,7 @@ def send_vertification_code(request):
 """
 log in
 """
+
 
 
 """

@@ -7,7 +7,12 @@ single_views = [
     {
         "route": "send-vertification-code/",
         "view": views.send_vertification_code,
-        "name": "send-vetification-code",
+        "name": "send-vertification-code",
+    },
+    {
+        "route": "register/",
+        "view": views.register,
+        "name": "register",
     },
 ]
 
