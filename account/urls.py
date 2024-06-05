@@ -19,6 +19,11 @@ single_views = [
         "view": views.login,
         "name": "login",
     },
+    {
+        "route": "logout/",
+        "view": views.logout,
+        "name": "logout",
+    },
 ]
 
 router = RouterWithSingleView(single_views=single_views)

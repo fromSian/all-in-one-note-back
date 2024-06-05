@@ -150,10 +150,12 @@ AUTH_USER_MODEL = "account.User"
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "utils.authentication.RedisJWTAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
+    "EXCEPTION_HANDLER": "utils.exception.custom_exception_handler",
 }
 
 # JWT token settings
