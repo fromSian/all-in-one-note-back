@@ -222,7 +222,7 @@ def login(request):
         serializer_data = serializer.data
         access_token = str(jwt_token.access_token)
         serializer_data["token"] = access_token
-        cache.set(user.email, access_token, 7 * 24 * 60 * 60)
+        # cache.set(user.email, access_token, 7 * 24 * 60 * 60)
 
         return Response(
             {"success": True, "message": "登录成功", **serializer_data},
@@ -246,7 +246,8 @@ log out
 
 
 def logout_logic(key):
-    isDeleted = cache.delete(key) if cache.has_key(key) else True
+    # isDeleted = cache.delete(key) if cache.has_key(key) else True
+    isDeleted = True
     return isDeleted
 
 
