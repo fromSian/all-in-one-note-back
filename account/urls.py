@@ -24,6 +24,16 @@ single_views = [
         "view": views.logout,
         "name": "logout",
     },
+    {
+        "route": "password/",
+        "view": views.PasswordView.as_view(),
+        "name": "password",
+    },
+    {
+        "route": "email/",
+        "view": views.email,
+        "name": "email",
+    },
 ]
 
 router = RouterWithSingleView(single_views=single_views)
@@ -33,4 +43,6 @@ router.register("test", views.UserViewSet, basename="test")
 urlpatterns = [
     path("", include(router.urls)),
 ]
-urlpatterns.extend([path(route=i['route'], view=i['view'], name=i['name']) for i in single_views])
+urlpatterns.extend(
+    [path(route=i["route"], view=i["view"], name=i["name"]) for i in single_views]
+)

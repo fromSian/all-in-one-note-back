@@ -11,8 +11,18 @@ class UserSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
         fields = [
             "email",
             "password",
+            "avatar",
+            'bio'
         ]
         # encrypt_fields = ("password",)
+        # read_only_fields = ('password',)
+        write_only_fields = ('password',)
+        # extra_kwargs = {
+        #     "password": {
+        #         "write_only": True,
+        #         "required": True,
+        #     },
+        # }
 
     def create(self, validated_data):
         normal = Group.objects.filter(name="front").first()

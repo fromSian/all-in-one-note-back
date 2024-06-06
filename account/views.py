@@ -2,6 +2,7 @@ from .models import User
 from .serializers import UserSerializer
 
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, renderer_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -21,6 +22,8 @@ from drf_yasg import openapi
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from datetime import timedelta
+
+from utils.authentication import check_operation_validation
 
 
 # Create your views here.
@@ -242,6 +245,11 @@ log out
 """
 
 
+def logout_logic(key):
+    isDeleted = cache.delete(key) if cache.has_key(key) else True
+    return isDeleted
+
+
 @swagger_auto_schema(
     method="POST",
     operation_description="log out",
@@ -257,7 +265,7 @@ def logout(request):
         user = request.user
         # if not user.is_authenticated:
         #     raise Exception("haven't login yet")
-        isDeleted = cache.delete(user.email) if cache.has_key(user.email) else True
+        isDeleted = logout_logic(user.email)
 
         if isDeleted:
             return Response(
@@ -272,20 +280,197 @@ def logout(request):
         )
 
 
-"""
-change password
-"""
+class PasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="verify password",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=["password"],
+            properties={
+                "password": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="password"
+                ),
+            },
+        ),
+        responses={
+            status.HTTP_202_ACCEPTED: openapi.Response(
+                "success", examples={"success": True, "message": "success"}
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response(
+                "fail", examples={"success": False, "message": "fail"}
+            ),
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        """
+        verify password
+        """
+        try:
+            password = request.data.get("password")
+            user = request.user
+            is_pass = user.check_password(password)
+            if is_pass:
+                return Response(
+                    {"success": True, "message": "Password verified"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                raise ValidationError("Invalid password")
+        except ValidationError as e:
+            print(e)
+            return Response(
+                {"success": False, "message": e.message},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            print(e)
+            return Response(
+                {"success": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @swagger_auto_schema(
+        operation_description="verify password",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=["password"],
+            properties={
+                "password": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="password"
+                ),
+            },
+        ),
+        responses={
+            status.HTTP_202_ACCEPTED: openapi.Response(
+                "success", examples={"success": True, "message": "success"}
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response(
+                "fail", examples={"success": False, "message": "fail"}
+            ),
+        },
+    )
+    def patch(self, request, *args, **kwargs):
+        """
+        change password
+        use old password or email verify
+
+        encrypt params
+        params: {
+        'expire_time': date time str with time zone
+        'action_time': date time str with time zone
+        }
+
+        if success log out
+        """
+        try:
+            password = request.data.get("password")
+            user = request.user
+            user.set_password(password)
+            logout_logic(user.email)
+            return Response(
+                {"success": True, "message": "password changed"},
+                status=status.HTTP_202_ACCEPTED,
+            )
+        except ValidationError as e:
+            print(e)
+            return Response(
+                {"success": False, "message": e.message},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            print(e)
+            return Response(
+                {"success": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
 """
 change email
+use old password or email verify
+encrypt params
+        params: {
+        'expire_time': date time str with time zone
+        'action_time': date time str with time zone
+        }
+if success log out
 """
+
+
+@swagger_auto_schema(
+    method="PATCH",
+    operation_description="change email",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["email"],
+        properties={
+            "expire_time": openapi.Schema(
+                type=openapi.TYPE_STRING, description="email address"
+            ),
+            "action_time": openapi.Schema(
+                type=openapi.TYPE_STRING, description="email address"
+            ),
+            "email": openapi.Schema(
+                type=openapi.TYPE_STRING, description="email address"
+            ),
+        },
+    ),
+    responses={
+        status.HTTP_202_ACCEPTED: "success",
+        status.HTTP_400_BAD_REQUEST: "fail",
+    },
+)
+@api_view(["PATCH"])
+def email(request):
+    try:
+        expire_time = request.data.get("expire_time")
+        action_time = request.data.get("action_time")
+        check_operation_validation(expire_time, action_time)
+
+        email = request.data.get("email")
+        user = request.user
+        email_bak = user.email
+
+        serializer = UserSerializer(data={"email": email}, instance=user, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            logout_logic(email_bak)
+            return Response(
+                {"success": True, "message": "email updated successfully"},
+                status=status.HTTP_202_ACCEPTED,
+            )
+        else:
+            return Response(
+                {"success": False, "message": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"success": False, "message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        print(123, e)
+        return Response(
+            {"success": False, "message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
 
 """
 change avatar
 """
 
 
+@api_view(["PATCH"])
+def avatar(request):
+    pass
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
