@@ -5,10 +5,10 @@ from collections import OrderedDict
 from django.core.exceptions import ImproperlyConfigured
 
 
-class RSAEncryptSerializerMixin:
+class EncryptSerializerMixin:
     __ALL__ = "__all__"
     encryption: None
-    
+
     def _get_encrypt_fields(self, representation):
         encrypted_fields = getattr(self.Meta, "encrypt_fields", None)
         excluded_fields = getattr(self.Meta, "excluded_fields", None)

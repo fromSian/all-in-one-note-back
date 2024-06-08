@@ -1,6 +1,8 @@
 from django.db import models
 from account.models import User
+
 # Create your models here.
+
 
 class Note(models.Model):
     title = models.CharField(max_length=255)
@@ -8,11 +10,14 @@ class Note(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name="create time")
     updated = models.DateTimeField(auto_now_add=True, verbose_name="update time")
 
+    @property
+    def note_items(self):
+        return NoteItem.objects.filter(note=self).order_by("sort")
+
+
 class NoteItem(models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
     content = models.TextField()
     sort = models.PositiveIntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True, verbose_name="create time")
     updated = models.DateTimeField(auto_now_add=True, verbose_name="update time")
-
-

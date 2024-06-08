@@ -13,6 +13,7 @@ from django.utils.dateparse import parse_datetime
 
 class RedisJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
+        
         header = self.get_header(request)
         if header is None:
             return None
@@ -22,18 +23,16 @@ class RedisJWTAuthentication(JWTAuthentication):
             return None
 
         validated_token = self.get_validated_token(raw_token)
-
         user = self.get_user(validated_token)
-        return user
-        # if user:
-        #     email = user[0].email
-        #     token = cache.get(email)
-        #     if token == raw_token.decode("utf-8"):
-        #         return user
-        #     else:
-        #         raise InvalidToken()
-        # else:
-        #     return user
+        try:
+            email = user[0].email
+            token = cache.get(email)
+            if token == raw_token.decode("utf-8"):
+                return user
+            else:
+                raise InvalidToken()
+        except Exception as e:
+            raise InvalidToken(e)
 
 
 def check_operation_validation(expire_time, action_time):
