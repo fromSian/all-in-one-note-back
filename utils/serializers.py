@@ -5,9 +5,10 @@ from collections import OrderedDict
 from django.core.exceptions import ImproperlyConfigured
 
 
-class EncryptSerializerMixin(RSAEncryption):
+class RSAEncryptSerializerMixin:
     __ALL__ = "__all__"
-
+    encryption: None
+    
     def _get_encrypt_fields(self, representation):
         encrypted_fields = getattr(self.Meta, "encrypt_fields", None)
         excluded_fields = getattr(self.Meta, "excluded_fields", None)
@@ -65,10 +66,12 @@ class EncryptSerializerMixin(RSAEncryption):
 
         model_class = getattr(self.Meta, "model")
 
+        self.encryption = getattr(self.Meta, "encryption_class")()
+
         for key, value in representation.items():
             if key in field_list:
                 if isinstance(representation[key], str):
-                    representation[key] = self.encrypt(value)
+                    representation[key] = self.encryption.encrypt(value)
                 else:
                     raise ImproperlyConfigured(
                         "Field name `%s` is not able to be encrypted for model `%s`."
@@ -84,11 +87,13 @@ class EncryptSerializerMixin(RSAEncryption):
 
         model_class = getattr(self.Meta, "model")
 
+        self.encryption = getattr(self.Meta, "encryption_class")()
+
         _data = data.copy()
         for key, value in _data.items():
             if key in field_list:
                 if isinstance(value, str):
-                    _data.__setitem__(key, self.decrypt(value))
+                    _data.__setitem__(key, self.encryption.decrypt(value))
                 else:
                     raise ImproperlyConfigured(
                         "Field name `%s` is not able to be decrypted for model `%s`."

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from utils.urls.RouterWithSingleView import RouterWithSingleView
+from utils.urls import RouterWithSingleView
 from . import views
 
 single_views = [

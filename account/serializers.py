@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from utils.mixin.EncryptSerializerMixin import EncryptSerializerMixin
+from utils.serializers import RSAEncryptSerializerMixin
+from utils.encryption import RSAEncryption
 from .models import User
 from django.contrib.auth.models import Group
 
 
-class UserSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
+class UserSerializer(RSAEncryptSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = User
@@ -14,7 +15,8 @@ class UserSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
             "avatar",
             'bio'
         ]
-        # encrypt_fields = ("password",)
+        encryption_class = RSAEncryption
+        encrypt_fields = ("password",)
         # read_only_fields = ('password',)
         write_only_fields = ('password',)
         # extra_kwargs = {
