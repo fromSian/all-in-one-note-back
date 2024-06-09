@@ -24,15 +24,12 @@ class RedisJWTAuthentication(JWTAuthentication):
 
         validated_token = self.get_validated_token(raw_token)
         user = self.get_user(validated_token)
-        try:
-            email = user[0].email
-            token = cache.get(email)
-            if token == raw_token.decode("utf-8"):
-                return user
-            else:
-                raise InvalidToken()
-        except Exception as e:
-            raise InvalidToken(e)
+        email = user.email
+        token = cache.get(email)
+        if token == raw_token.decode("utf-8"):
+            return user, validated_token
+        else:
+            raise InvalidToken()
 
 
 def check_operation_validation(expire_time, action_time):

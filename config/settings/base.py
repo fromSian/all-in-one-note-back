@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     # local application
     "account",
-    'note',
+    "note",
 ]
 
 MIDDLEWARE = [
@@ -151,8 +151,8 @@ AUTH_USER_MODEL = "account.User"
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-        # "utils.authentication.RedisJWTAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "utils.authentication.RedisJWTAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S %Z",
@@ -189,17 +189,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis-17938.c56.east-us.azure.redns.redis-cloud.com:17938",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "DB": "cache-LX0NU332",
-            "PASSWORD": "MsKFFHE4r8Yiu0C7ldOi6JV7AAcBLUUs",
-        },
-    }
-}
 
 ADMINS = [("notes & todos", "notetodos@163.com")]
