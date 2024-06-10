@@ -34,10 +34,24 @@ single_views = [
         "view": views.email,
         "name": "email",
     },
+    {
+        "route": "avatar/",
+        "view": views.avatar,
+        "name": "avatar",
+    },
+    {
+        "route": "bio/",
+        "view": views.bio,
+        "name": "bio",
+    },
+    {
+        "route": "info/",
+        "view": views.info,
+        "name": "info",
+    },
 ]
 
 router = RouterWithSingleView(single_views=single_views)
-router.register("test", views.UserViewSet, basename="test")
 
 
 urlpatterns = [

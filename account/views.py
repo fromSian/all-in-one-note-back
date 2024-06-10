@@ -3,9 +3,14 @@ from .serializers import UserSerializer
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    renderer_classes,
+    permission_classes,
+    parser_classes,
+)
 from rest_framework.response import Response
-from rest_framework import status, permissions
+from rest_framework import status, permissions, parsers
 from rest_framework.renderers import BrowsableAPIRenderer
 
 from django.core.mail import send_mail
@@ -456,12 +461,127 @@ change avatar
 """
 
 
-@api_view(["PATCH"])
+@swagger_auto_schema(
+    method="PUT",
+    operation_description="change avatar",
+    manual_parameters=[
+        openapi.Parameter(
+            name="file",
+            in_=openapi.IN_FORM,
+            type=openapi.TYPE_FILE,
+            required=True,
+            description="avatar file",
+        )
+    ],
+    responses={
+        status.HTTP_202_ACCEPTED: "success",
+        status.HTTP_400_BAD_REQUEST: "fail",
+    },
+)
+@api_view(["PUT"])
+@parser_classes([parsers.MultiPartParser])
+@permission_classes([permissions.IsAuthenticated])
 def avatar(request):
-    pass
+    try:
+        avatar_file = request.data.get("file", None)
+        if avatar_file is None:
+            raise ValidationError("avatar file is required")
+        user = request.user
+        serializer = UserSerializer(
+            instance=user, data={"avatar": avatar_file}, partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "avatar changed"}, status=status.HTTP_202_ACCEPTED
+            )
+        else:
+            return Response(
+                {"message": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+"""
+change bio
+"""
+
+
+@swagger_auto_schema(
+    method="PUT",
+    operation_description="change bio",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["bio"],
+        properties={
+            "bio": openapi.Schema(type=openapi.TYPE_STRING, description="bio"),
+        },
+    ),
+    responses={
+        status.HTTP_202_ACCEPTED: "success",
+        status.HTTP_400_BAD_REQUEST: "fail",
+    },
+)
+@api_view(["PUT"])
+@permission_classes([permissions.IsAuthenticated])
+def bio(request):
+    try:
+        bio = request.data.get("bio", "")
+        user = request.user
+        serializer = UserSerializer(instance=user, data={"bio": bio}, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "bio changed"}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(
+                {"message": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+"""
+get account information
+"""
+
+
+@api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated])
+def info(request):
+    try:
+        user = request.user
+        print(user, user.avatar)
+        serializer = UserSerializer(instance=user, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
