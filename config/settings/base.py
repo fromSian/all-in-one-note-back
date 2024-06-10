@@ -159,7 +159,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S %Z",
-    "EXCEPTION_HANDLER": "utils.exception.custom_exception_handler",
+    # "EXCEPTION_HANDLER": "utils.exception.custom_exception_handler",
 }
 
 # JWT token settings
