@@ -58,10 +58,10 @@ password: using ras encryption
     ),
     responses={
         status.HTTP_201_CREATED: openapi.Response(
-            "success", examples={"success": True, "message": "success"}
+            "success", examples={"message": "success"}
         ),
         status.HTTP_400_BAD_REQUEST: openapi.Response(
-            "fail", examples={"success": False, "message": "fail"}
+            "fail", examples={"message": "fail"}
         ),
     },
 )
@@ -75,24 +75,24 @@ def register(request):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                data={"success": True, "message": "registered"},
+                data={"message": "registered"},
                 status=status.HTTP_201_CREATED,
             )
         else:
             return Response(
-                data={"success": False, "message": serializer.error_messages},
+                data={"message": serializer.error_messages},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except ValidationError as e:
         print(e)
         return Response(
-            data={"success": False, "message": e.message},
+            data={"message": e.message},
             status=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as e:
         print(e)
         return Response(
-            data={"success": False, "message": str(e)},
+            data={"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -140,10 +140,10 @@ def code_validator(value):
     ),
     responses={
         status.HTTP_200_OK: openapi.Response(
-            "success", examples={"success": True, "message": "success"}
+            "success", examples={"message": "success"}
         ),
         status.HTTP_400_BAD_REQUEST: openapi.Response(
-            "fail", examples={"success": False, "message": "fail"}
+            "fail", examples={"message": "fail"}
         ),
     },
 )
@@ -165,7 +165,6 @@ def send_vertification_code(request):
         )
         return Response(
             {
-                "success": True,
                 "message": "send vertification code to email success",
             },
             status=status.HTTP_200_OK,
@@ -173,13 +172,13 @@ def send_vertification_code(request):
     except ValidationError as e:
         print("fail", e)
         return Response(
-            {"success": False, "message": e.message},
+            {"message": e.message},
             status=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as e:
         print("fail", e)
         return Response(
-            {"success": False, "message": str(e)},
+            {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -222,22 +221,18 @@ def login(request):
         serializer_data = serializer.data
         access_token = str(jwt_token.access_token)
         serializer_data["token"] = access_token
-        # cache.set(user.email, access_token, 7 * 24 * 60 * 60)
+        cache.set(user.email, access_token, 7 * 24 * 60 * 60)
 
         return Response(
-            {"success": True, "message": "登录成功", **serializer_data},
+            {"message": "log in successfully", **serializer_data},
             status=status.HTTP_202_ACCEPTED,
         )
     except ValidationError as e:
         print(e)
-        return Response(
-            {"success": False, "message": e.message}, status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"message": e.message}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         print(e)
-        return Response(
-            {"success": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 """
@@ -246,8 +241,7 @@ log out
 
 
 def logout_logic(key):
-    # isDeleted = cache.delete(key) if cache.has_key(key) else True
-    isDeleted = True
+    isDeleted = cache.delete(key) if cache.has_key(key) else True
     return isDeleted
 
 
@@ -264,21 +258,17 @@ def logout_logic(key):
 def logout(request):
     try:
         user = request.user
-        # if not user.is_authenticated:
-        #     raise Exception("haven't login yet")
         isDeleted = logout_logic(user.email)
 
         if isDeleted:
             return Response(
-                {"success": True, "message": "logout success"},
+                {"message": "logout success"},
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
             raise Exception("log out failed")
     except Exception as e:
-        return Response(
-            {"success": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordView(APIView):
@@ -297,10 +287,10 @@ class PasswordView(APIView):
         ),
         responses={
             status.HTTP_202_ACCEPTED: openapi.Response(
-                "success", examples={"success": True, "message": "success"}
+                "success", examples={"message": "success"}
             ),
             status.HTTP_400_BAD_REQUEST: openapi.Response(
-                "fail", examples={"success": False, "message": "fail"}
+                "fail", examples={"message": "fail"}
             ),
         },
     )
@@ -314,7 +304,7 @@ class PasswordView(APIView):
             is_pass = user.check_password(password)
             if is_pass:
                 return Response(
-                    {"success": True, "message": "Password verified"},
+                    {"message": "Password verified"},
                     status=status.HTTP_200_OK,
                 )
             else:
@@ -322,18 +312,18 @@ class PasswordView(APIView):
         except ValidationError as e:
             print(e)
             return Response(
-                {"success": False, "message": e.message},
+                {"message": e.message},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
             print(e)
             return Response(
-                {"success": False, "message": str(e)},
+                {"message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
     @swagger_auto_schema(
-        operation_description="verify password",
+        operation_description="update password",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=["password"],
@@ -345,14 +335,14 @@ class PasswordView(APIView):
         ),
         responses={
             status.HTTP_202_ACCEPTED: openapi.Response(
-                "success", examples={"success": True, "message": "success"}
+                "success", examples={"message": "success"}
             ),
             status.HTTP_400_BAD_REQUEST: openapi.Response(
-                "fail", examples={"success": False, "message": "fail"}
+                "fail", examples={"message": "fail"}
             ),
         },
     )
-    def patch(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         """
         change password
         use old password or email verify
@@ -371,19 +361,19 @@ class PasswordView(APIView):
             user.set_password(password)
             logout_logic(user.email)
             return Response(
-                {"success": True, "message": "password changed"},
+                {"message": "password changed"},
                 status=status.HTTP_202_ACCEPTED,
             )
         except ValidationError as e:
             print(e)
             return Response(
-                {"success": False, "message": e.message},
+                {"message": e.message},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
             print(e)
             return Response(
-                {"success": False, "message": str(e)},
+                {"message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -401,7 +391,7 @@ if success log out
 
 
 @swagger_auto_schema(
-    method="PATCH",
+    method="PUT",
     operation_description="change email",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -423,7 +413,7 @@ if success log out
         status.HTTP_400_BAD_REQUEST: "fail",
     },
 )
-@api_view(["PATCH"])
+@api_view(["PUT"])
 def email(request):
     try:
         expire_time = request.data.get("expire_time")
@@ -439,24 +429,24 @@ def email(request):
             serializer.save()
             logout_logic(email_bak)
             return Response(
-                {"success": True, "message": "email updated successfully"},
+                {"message": "email updated successfully"},
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
             return Response(
-                {"success": False, "message": serializer.errors},
+                {"message": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except ValidationError as e:
         print(e)
         return Response(
-            {"success": False, "message": e.message},
+            {"message": e.message},
             status=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as e:
         print(123, e)
         return Response(
-            {"success": False, "message": str(e)},
+            {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
