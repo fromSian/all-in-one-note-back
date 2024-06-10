@@ -150,6 +150,9 @@ AUTH_USER_MODEL = "account.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    'DEFAULT_RENDERER_CLASSES': [
+        'utils.views.EnvelopedJSONRenderer',
+    ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # "rest_framework_simplejwt.authentication.JWTAuthentication",
         "utils.authentication.RedisJWTAuthentication",
