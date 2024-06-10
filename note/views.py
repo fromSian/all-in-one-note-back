@@ -2,6 +2,7 @@ from .serializers import (
     NoteSerializer,
     NoteItemSerializer,
     NoteWithNoteItemWriteSerializer,
+    NoteItemIndependentSerializer,
 )
 from .models import Note, NoteItem
 
@@ -14,12 +15,15 @@ from rest_framework.mixins import (
     UpdateModelMixin,
     RetrieveModelMixin,
 )
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 
 # Create your views here.
+
+"""note"""
+
 
 class NoteViewSet(
     ListModelMixin,
@@ -46,38 +50,6 @@ class NoteViewSet(
     """
 
     """
-    query note detail note_list
-
-    params note 'id'
-
-    pagination
-
-    response includes 'content' 'sort' 'created' 'updated'
-    """
-
-    # @action(detail=True, methods=["GET"])
-    # def items(self, request, *args, **kwargs):
-    #     page = self.paginate_queryset(queryset)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-
-    #     serializer = self.get_serializer(queryset, many=True)
-    #     return Response(True)
-    #     try:
-    #         note = self.get_object()
-    #         page = self.paginate_queryset(note.note_items)
-    #         if page is not None:
-    #             serializer = NoteItemSerializer(page, many=True)
-    #             return self.get_paginated_response(serializer.data)
-    #         else:
-
-    #         serializer = NoteItemSerializer(note.note_items, many=True)
-    #         return Response(serializer.data)
-    #     except Exception as e:
-    #         pass
-
-    """
     create a note
 
     params={
@@ -88,63 +60,83 @@ class NoteViewSet(
             },
     }
     """
+    """
+    update title
+    """
+    """
+    delete a note
+    """
+
+    """
+    query note detail note_list
+
+    params note 'id'
+
+    pagination
+
+    response includes 'content' 'sort' 'created' 'updated'
+    """
+
+    @action(detail=True, methods=["GET"])
+    def section(self, request, *args, **kwargs):
+        try:
+            note = self.get_object()
+            page = self.paginate_queryset(note.note_items)
+            if page is not None:
+                serializer = NoteItemSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            else:
+                serializer = NoteItemSerializer(note.note_items, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    haven't finish
+    '全量替换‘
+    update a note
+
+    deleted_note_id
+    note_items: 
+    {
+    id: {
+    content
+    }
+    }
+    if no id is removed
+
+    to new add note_item must setting the id with 'add_1/2/3/4'
+
+    will replace the sort but later write this part.
+    """
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
 
 
-# class NoteViewSet(ModelViewSet):
-#     queryset = Note.objects.all()
-#     serializer_class = NoteSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-
-"""
-set local and production env to config.settings
-"""
-
-
-class NoteItemViewSet(ModelViewSet):
+class NoteItemViewSet(
+    CreateModelMixin,
+    UpdateModelMixin,
+    DestroyModelMixin,
+    GenericViewSet,
+):
     queryset = NoteItem.objects.all()
-    serializer_class = NoteItemSerializer
 
+    def get_serializer_class(self):
+        if self.action == "create":
+            return NoteItemIndependentSerializer
+        else:
+            return NoteItemSerializer
 
-"""note"""
+    """
+    create one note_item to a note
+    the sort is added
+    """
 
+    """
+    update one note item
+    """
 
-"""
-create one note_item to a note
-
-the sort is added
-"""
-
-"""
-'全量替换‘
-update a note
-
-deleted_note_id
-note_items: 
-{
-id: {
-content
-}
-}
-if no id is removed
-
-to new add note_item must setting the id with 'add_1/2/3/4'
-
-will replace the sort but later write this part.
-"""
-
-"""
-update title
-"""
-
-"""
-update one note item
-"""
-
-"""
-delete a note item
-"""
-
-"""
-delete a note
-"""
+    """
+    delete a note item
+    """

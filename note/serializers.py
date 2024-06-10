@@ -3,13 +3,30 @@ from .models import Note, NoteItem
 from utils.encryption import AESEncryption
 from utils.serializers import EncryptSerializerMixin
 
+
 class NoteItemSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = NoteItem
         fields = ("id", "content", "note", "created", "updated", "sort")
-        read_only_fields = ["id", "sort", "created", "updated", "sort", "note"]
+        read_only_fields = ["id", "sort", "created", "updated", "note"]
         encryption_class = AESEncryption
-        encrypt_fields = ("content",)
+        # encrypt_fields = ("content",)
+
+
+class NoteItemIndependentSerializer(
+    EncryptSerializerMixin, serializers.ModelSerializer
+):
+    class Meta:
+        model = NoteItem
+        fields = ("id", "content", "note", "created", "updated", "sort")
+        read_only_fields = [
+            "id",
+            "sort",
+            "created",
+            "updated",
+        ]
+        encryption_class = AESEncryption
+        # encrypt_fields = ("content",)
 
 
 class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
@@ -26,7 +43,7 @@ class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
         )
         read_only_fields = ["id", "created", "updated", "summary", "note_items_count"]
         encryption_class = AESEncryption
-        encrypt_fields = ("title", "summary")
+        # encrypt_fields = ("title", "summary")
 
 
 class NoteWithNoteItemWriteSerializer(
