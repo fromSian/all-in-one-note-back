@@ -74,6 +74,7 @@ password: using ras encryption
 def register(request):
     try:
         data = request.data
+        data["type"] = "base"
 
         serializer = UserSerializer(data=data)
 
@@ -193,6 +194,14 @@ log in
 """
 
 
+def login_token_logic(user, valid_seconds):
+    jwt_token = RefreshToken.for_user(user)
+    access_token = str(jwt_token.access_token)
+    cache.set(user.email, access_token, valid_seconds)
+
+    return access_token
+
+
 @swagger_auto_schema(
     method="POST",
     operation_description="log in with email and password",
@@ -219,14 +228,15 @@ def login(request):
     try:
         user_data = request.data
         user = authenticate(username=user_data["email"], password=user_data["password"])
-        if not user or not user.groups.values("name").filter(name="front").exists():
+        if not user:
+            raise ValidationError("Invalid username or password")
+
+        if not user.groups.values("name").filter(name="front").exists():
             raise ValidationError("not accessible for this login")
         serializer = UserSerializer(user)
-        jwt_token = RefreshToken.for_user(user)
+        access_token = login_token_logic(user, valid_seconds=7 * 24 * 60 * 60)
         serializer_data = serializer.data
-        access_token = str(jwt_token.access_token)
         serializer_data["token"] = access_token
-        cache.set(user.email, access_token, 7 * 24 * 60 * 60)
 
         return Response(
             {"message": "log in successfully", **serializer_data},
@@ -585,3 +595,9 @@ def info(request):
             {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class TestViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]

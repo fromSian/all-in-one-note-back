@@ -57,18 +57,20 @@ class User(AbstractUser):
     username = None
 
     email = models.EmailField("email address", unique=True)
+    password = models.CharField("password", max_length=128, blank=True)
     bio = models.CharField("bio", blank=True, max_length=255)
-    avatar = models.ImageField(
-        "avatar", upload_to="avatar/%Y/%m/%d", blank=True, null=True
+    image = models.URLField(
+        "avatar image url",
+        blank=True,
     )
+    TYPE_CHOICES = (
+        ("base", "from_base"),
+        ("google", "from_google"),
+    )
+    type = models.CharField("type", choices=TYPE_CHOICES, blank=False, default='base')
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = UserManager()
-
-    @property
-    def avatar_url(self):
-        if self.avatar and hasattr(self.avatar, "url"):
-            return self.avatar.url

@@ -46,6 +46,15 @@ urlpatterns = [
     path("note/", include("note.urls")),
 ]
 
+'''
+google oauth access
+
+/account/google/access
+
+google oauth callback
+
+/account/google/callback
+'''
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

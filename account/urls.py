@@ -2,8 +2,19 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from utils.urls import RouterWithSingleView
 from . import views
+from utils.google import GoogleLoginAccessView, GoogleLoginCallbackView
 
 single_views = [
+    {
+        "route": "google/access",
+        "view": GoogleLoginAccessView.as_view(),
+        "name": "google-access",
+    },
+    {
+        "route": "google/callback",
+        "view": GoogleLoginCallbackView.as_view(),
+        "name": "google-callback",
+    },
     {
         "route": "send-vertification-code/",
         "view": views.send_vertification_code,
@@ -52,7 +63,7 @@ single_views = [
 ]
 
 router = RouterWithSingleView(single_views=single_views)
-
+router.register("test", views.TestViewSet, basename="test")
 
 urlpatterns = [
     path("", include(router.urls)),

@@ -5,21 +5,22 @@ from .models import User
 from django.contrib.auth.models import Group
 from rest_framework.serializers import ImageField
 
+
 class UserSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["email", "password", "avatar", "bio"]
+        fields = ["email", "password", "image", "bio", "type"]
         encryption_class = RSAEncryption
         # encrypt_fields = ("password",)
-        # read_only_fields = ("avatar_url",)
-        write_only_fields = ("password",)
-        # extra_kwargs = {
-        #     "password": {
-        #         "write_only": True,
-        #         "required": True,
-        #     },
-        # }
+        # read_only_fields = ("type",)
+        # write_only_fields = ("password",)
+        extra_kwargs = {
+            "password": {
+                "write_only": True,
+                "required": False,
+            },
+        }
 
     def create(self, validated_data):
         normal = Group.objects.filter(name="front").first()

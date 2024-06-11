@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_yasg",
     "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist",
     # local application
     "account",
     "note",
@@ -194,3 +193,14 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 ADMINS = [("notes & todos", "notetodos@163.com")]
+
+
+'''
+google oauth2
+'''
+
+GOOGLE_OAUTH2_CLIENT_ID='973500819258-0etd8ouhtgq904uo8p712sr3q0krtdk2.apps.googleusercontent.com'
+GOOGLE_OAUTH2_CLIENT_SECRET='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'
+GOOGLE_OAUTH2_PROJECT_ID='nextjsfollow'
+
+BASE_BACKEND_URL = 'http://localhost:8000/'
