@@ -60,6 +60,11 @@ single_views = [
         "view": views.info,
         "name": "info",
     },
+    {
+        "route": "upload-avatar/",
+        "view": views.upload_avatar,
+        "name": "upload_avatar",
+    },
 ]
 
 router = RouterWithSingleView(single_views=single_views)

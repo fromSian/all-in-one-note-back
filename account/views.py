@@ -1,5 +1,5 @@
 from .models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, ImageFileSerializer
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -29,6 +29,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import timedelta
 
 from utils.authentication import check_operation_validation
+from utils.file import handle_uploaded_file
 
 
 # Create your views here.
@@ -601,3 +602,60 @@ class TestViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
+
+
+"""
+upload avatar image file view
+return image_url
+"""
+
+
+@swagger_auto_schema(
+    method="POST",
+    operation_description="upload avatar file",
+    manual_parameters=[
+        openapi.Parameter(
+            name="file",
+            in_=openapi.IN_FORM,
+            type=openapi.TYPE_FILE,
+            required=True,
+            description="avatar file",
+        )
+    ],
+    responses={
+        status.HTTP_202_ACCEPTED: "success",
+        status.HTTP_400_BAD_REQUEST: "fail",
+    },
+)
+@api_view(["POST"])
+@parser_classes([parsers.MultiPartParser])
+def upload_avatar(request):
+    try:
+        file = request.data.get("file", None)
+        if file is None:
+            raise ValidationError("avatar file is required")
+        serialzer = ImageFileSerializer(data={"file": file})
+        if serialzer.is_valid():
+            loaded_file = serialzer.validated_data.get("file")
+            path = handle_uploaded_file(loaded_file, loaded_file.name)
+            print(path)
+            return Response(
+                {"url": request.build_absolute_uri(path)},
+                status=status.HTTP_202_ACCEPTED,
+            )
+        else:
+            return Response(
+                {"message": serialzer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
