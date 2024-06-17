@@ -251,7 +251,11 @@ class GoogleLoginCallbackView(APIView):
             id_token_decoded
             {"iss": "https://accounts.google.com","azp": "973500819258-0etd8ouhtgq904uo8p712sr3q0krtdk2.apps.googleusercontent.com","aud": "973500819258-0etd8ouhtgq904uo8p712sr3q0krtdk2.apps.googleusercontent.com","sub": "115314909056023843600","email": "fromsianqian@gmail.com","email_verified": true,"at_hash": "n9JfIKs58hujaQusQustGQ","name": "sian","picture": "https://lh3.googleusercontent.com/a/ACg8ocIReman0S-EsWABKf6Ti3jZn0tME6eVT_z86XlbTnabhV-YVg=s96-c","given_name": "sian","iat": 1718094759,"exp": 1718098359}"""
             # return Response(result, status=status.HTTP_200_OK)
-            query_params = urlencode(result)
+            query_params = urlencode(
+                {
+                    "token": token,
+                }
+            )
             url = f"{settings.GOOGLE_OAUTH2_REDIRECT_SUCCESS_URL}?{query_params}"
             return HttpResponseRedirect(url)
         except ValidationError as e:
