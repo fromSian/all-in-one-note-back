@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_yasg",
     "rest_framework_simplejwt",
+    "drf_api_logger",
     # local application
     "account",
     "note",
@@ -60,7 +61,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware",
 ]
+DRF_API_LOGGER_DATABASE = True
 
 ROOT_URLCONF = "config.urls"
 
@@ -149,8 +152,8 @@ AUTH_USER_MODEL = "account.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    'DEFAULT_RENDERER_CLASSES': [
-        'utils.views.EnvelopedJSONRenderer',
+    "DEFAULT_RENDERER_CLASSES": [
+        "utils.views.EnvelopedJSONRenderer",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -195,12 +198,14 @@ CORS_ALLOWED_ORIGINS = [
 ADMINS = [("notes & todos", "notetodos@163.com")]
 
 
-'''
+"""
 google oauth2
-'''
+"""
 
-GOOGLE_OAUTH2_CLIENT_ID='973500819258-0etd8ouhtgq904uo8p712sr3q0krtdk2.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET='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'
-GOOGLE_OAUTH2_PROJECT_ID='nextjsfollow'
+GOOGLE_OAUTH2_CLIENT_ID = (
+    "973500819258-0etd8ouhtgq904uo8p712sr3q0krtdk2.apps.googleusercontent.com"
+)
+GOOGLE_OAUTH2_CLIENT_SECRET = "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"
+GOOGLE_OAUTH2_PROJECT_ID = "nextjsfollow"
 
-BASE_BACKEND_URL = 'http://localhost:8000/'
+BASE_BACKEND_URL = "http://localhost:8000/"
