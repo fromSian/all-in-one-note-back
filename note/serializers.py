@@ -7,8 +7,8 @@ from utils.serializers import EncryptSerializerMixin
 class NoteItemSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = NoteItem
-        fields = ("id", "content", "note", "created", "updated", "sort")
-        read_only_fields = ["id", "sort", "created", "updated", "note"]
+        fields = ("id", "content", "note", "created", "updated", "summary")
+        read_only_fields = ["id", "created", "updated", "note"]
         encryption_class = AESEncryption
         # encrypt_fields = ("content",)
 
@@ -18,7 +18,7 @@ class NoteItemIndependentSerializer(
 ):
     class Meta:
         model = NoteItem
-        fields = ("id", "content", "note", "created", "updated", "sort")
+        fields = ("id", "content", "note", "created", "updated", "summary")
         read_only_fields = [
             "id",
             "sort",
@@ -41,29 +41,34 @@ class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
             "created",
             "updated",
         )
-        read_only_fields = ["id", "created", "updated", "summary", "note_items_count"]
+        read_only_fields = ["id", "created", "summary", "updated", "note_items_count"]
         encryption_class = AESEncryption
         # encrypt_fields = ("title", "summary")
 
-
-class NoteWithNoteItemWriteSerializer(
-    EncryptSerializerMixin, serializers.ModelSerializer
-):
-    note_list = NoteItemSerializer(source="note_items", many=True)
-
-    class Meta:
-        model = Note
-        fields = ["title", "note_list"]
-        encryption_class = AESEncryption
-        encryption_class = ("title",)
-
     def create(self, validated_data):
         user = self.context["request"].user
-        note_list = validated_data.pop("note_items", [])
-        print(user, validated_data)
         note = Note.objects.create(user=user, **validated_data)
-        for note_item in note_list:
-            NoteItem.objects.create(
-                note=note, sort=note_list.index(note_item), **note_item
-            )
         return note
+
+
+# class NoteWithNoteItemWriteSerializer(
+#     EncryptSerializerMixin, serializers.ModelSerializer
+# ):
+#     note_list = NoteItemSerializer(source="note_items", many=True)
+
+#     class Meta:
+#         model = Note
+#         fields = ["title", "note_list"]
+#         encryption_class = AESEncryption
+#         encryption_class = ("title",)
+
+#     def create(self, validated_data):
+#         user = self.context["request"].user
+#         note_list = validated_data.pop("note_items", [])
+#         print(user, validated_data)
+#         note = Note.objects.create(user=user, **validated_data)
+#         for note_item in note_list:
+#             NoteItem.objects.create(
+#                 note=note, sort=note_list.index(note_item), **note_item
+#             )
+#         return note

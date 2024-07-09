@@ -1,10 +1,10 @@
 from .serializers import (
     NoteSerializer,
     NoteItemSerializer,
-    NoteWithNoteItemWriteSerializer,
     NoteItemIndependentSerializer,
 )
 from .models import Note, NoteItem
+from .filters import NoteFilter
 
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
@@ -19,6 +19,7 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
+from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
 
@@ -34,12 +35,11 @@ class NoteViewSet(
     GenericViewSet,
 ):
     queryset = Note.objects.all()
+    # permission_classes = [permissions.IsAuthenticated]
+    filterset_class = NoteFilter
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return NoteWithNoteItemWriteSerializer
-        else:
-            return NoteSerializer
+        return NoteSerializer
 
     """
     query note list
@@ -77,19 +77,19 @@ class NoteViewSet(
     response includes 'content' 'sort' 'created' 'updated'
     """
 
-    @action(detail=True, methods=["GET"])
-    def section(self, request, *args, **kwargs):
-        try:
-            note = self.get_object()
-            page = self.paginate_queryset(note.note_items)
-            if page is not None:
-                serializer = NoteItemSerializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            else:
-                serializer = NoteItemSerializer(note.note_items, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    # @action(detail=True, methods=["GET"])
+    # def section(self, request, *args, **kwargs):
+    #     try:
+    #         note = self.get_object()
+    #         page = self.paginate_queryset(note.note_items)
+    #         if page is not None:
+    #             serializer = NoteItemSerializer(page, many=True)
+    #             return self.get_paginated_response(serializer.data)
+    #         else:
+    #             serializer = NoteItemSerializer(note.note_items, many=True)
+    #             return Response(serializer.data, status=status.HTTP_200_OK)
+    #     except Exception as e:
+    #         return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     """
     haven't finish
@@ -110,8 +110,8 @@ class NoteViewSet(
     will replace the sort but later write this part.
     """
 
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+    # def update(self, request, *args, **kwargs):
+    #     return super().update(request, *args, **kwargs)
 
 
 class NoteItemViewSet(
