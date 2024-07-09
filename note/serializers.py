@@ -40,8 +40,16 @@ class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
             "note_items_count",
             "created",
             "updated",
+            "user",
         )
-        read_only_fields = ["id", "created", "summary", "updated", "note_items_count"]
+        read_only_fields = [
+            "id",
+            "created",
+            "summary",
+            "updated",
+            "note_items_count",
+            "user",
+        ]
         encryption_class = AESEncryption
         # encrypt_fields = ("title", "summary")
 
@@ -49,6 +57,12 @@ class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
         user = self.context["request"].user
         note = Note.objects.create(user=user, **validated_data)
         return note
+
+    def update(self, instance, validated_data):
+        user = self.context["request"].user
+        if user != instance.user:
+            raise serializers.ValidationError("Permission denied")
+        return self.update(self, instance, validated_data)
 
 
 # class NoteWithNoteItemWriteSerializer(

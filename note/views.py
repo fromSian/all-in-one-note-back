@@ -34,9 +34,12 @@ class NoteViewSet(
     DestroyModelMixin,
     GenericViewSet,
 ):
-    queryset = Note.objects.all()
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     filterset_class = NoteFilter
+
+    def get_queryset(self):
+        user = self.request.user
+        return Note.objects.filter(user=user).order_by("-updated")
 
     def get_serializer_class(self):
         return NoteSerializer
