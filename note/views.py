@@ -4,7 +4,7 @@ from .serializers import (
     NoteItemIndependentSerializer,
 )
 from .models import Note, NoteItem
-from .filters import NoteFilter
+from .filters import NoteFilter, NoteItemFilter
 
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
@@ -118,6 +118,7 @@ class NoteViewSet(
 
 
 class NoteItemViewSet(
+    ListModelMixin,
     CreateModelMixin,
     UpdateModelMixin,
     DestroyModelMixin,
@@ -130,6 +131,8 @@ class NoteItemViewSet(
             return NoteItemIndependentSerializer
         else:
             return NoteItemSerializer
+
+    filterset_class = NoteItemFilter
 
     """
     create one note_item to a note

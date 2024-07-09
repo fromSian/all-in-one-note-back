@@ -21,12 +21,13 @@ class NoteItemIndependentSerializer(
         fields = ("id", "content", "note", "created", "updated", "summary")
         read_only_fields = [
             "id",
-            "sort",
             "created",
             "updated",
         ]
         encryption_class = AESEncryption
         # encrypt_fields = ("content",)
+
+        # validate note user is the same
 
 
 class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
