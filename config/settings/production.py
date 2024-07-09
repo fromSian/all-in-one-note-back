@@ -11,3 +11,18 @@ CACHES = {
         },
     }
 }
+
+
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres.xesbgjafrslmhbctfhnl",
+        "PASSWORD": "SotoNote0530001",
+        "HOST": "aws-0-ap-southeast-1.pooler.supabase.com",
+        "PORT": "6543",
+    }
+}

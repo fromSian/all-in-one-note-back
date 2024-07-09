@@ -30,7 +30,7 @@ from datetime import timedelta
 
 from utils.authentication import check_operation_validation
 from utils.file import handle_uploaded_file
-
+from uuid import uuid4
 
 # Create your views here.
 
@@ -191,8 +191,44 @@ def send_vertification_code(request):
 
 
 """
-log in
+create trial user
 """
+
+
+@api_view(["POST"])
+def trial(request):
+    try:
+        data = {
+            "email": "{0}@benotes.com".format(uuid4()),
+            "type": "trial",
+            "password": "",
+        }
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid():
+            user = serializer.save()
+            print(user, serializer.data)
+            access_token = login_token_logic(user, 60 * 60 * 1)
+            return Response(
+                {"message": "login success", "access_token": access_token},
+                status=status.HTTP_202_ACCEPTED,
+            )
+        else:
+            return Response(
+                {"message": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValidationError as e:
+        print("fail", e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        print("fail", e)
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 def login_token_logic(user, valid_seconds):
@@ -201,6 +237,11 @@ def login_token_logic(user, valid_seconds):
     cache.set(user.email, access_token, valid_seconds)
 
     return access_token
+
+
+"""
+log in
+"""
 
 
 @swagger_auto_schema(
@@ -234,6 +275,12 @@ def login(request):
 
         if not user.groups.values("name").filter(name="front").exists():
             raise ValidationError("not accessible for this login")
+
+        if user.type == "google":
+            raise ValidationError("please use the sign in with google")
+
+        if user.type == "trial":
+            raise ValidationError("sorry, you are not allowed to login")
         serializer = UserSerializer(user)
         access_token = login_token_logic(user, valid_seconds=7 * 24 * 60 * 60)
         serializer_data = serializer.data
@@ -601,7 +648,7 @@ def info(request):
 class TestViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 """

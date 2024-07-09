@@ -12,7 +12,7 @@ class UserSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["email", "password", "image", "bio", "type"]
+        fields = ["email", "password", "image", "type"]
         encryption_class = RSAEncryption
         # encrypt_fields = ("password",)
         # read_only_fields = ("type",)
@@ -75,4 +75,3 @@ class ImageFileSerializer(serializers.Serializer):
         validate_image_content_type(value)
         validate_image_size(value)
         return value
-    

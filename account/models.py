@@ -58,7 +58,6 @@ class User(AbstractUser):
 
     email = models.EmailField("email address", unique=True)
     password = models.CharField("password", max_length=128, blank=True)
-    bio = models.CharField("bio", blank=True, max_length=255)
     image = models.URLField(
         "avatar image url",
         blank=True,
@@ -66,8 +65,9 @@ class User(AbstractUser):
     TYPE_CHOICES = (
         ("base", "from_base"),
         ("google", "from_google"),
+        ("trial", "from_trial"),
     )
-    type = models.CharField("type", choices=TYPE_CHOICES, blank=False, default='base')
+    type = models.CharField("type", choices=TYPE_CHOICES, blank=False, default="base")
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
