@@ -31,7 +31,7 @@ class Note(models.Model):
         return self.note_items.first().summary if self.note_items else ""
 
     def __str__(self) -> str:
-        return self.title
+        return self.titlex
 
 
 class NoteItem(models.Model):

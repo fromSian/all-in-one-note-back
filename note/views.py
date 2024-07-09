@@ -117,6 +117,25 @@ class NoteViewSet(
     #     return super().update(request, *args, **kwargs)
 
 
+from django_filters.rest_framework import DjangoFilterBackend
+
+
+class NoteItemFilterBackend(DjangoFilterBackend):
+    def get_filterset_class(self, view, queryset):
+        if view.action == "list":
+            return NoteItemFilter
+        return super().get_filterset_class(view, queryset)
+
+    # def get_filterset_kwargs(self, request, queryset, view):
+    #     kwargs = super().get_filterset_kwargs(request, queryset, view)
+
+    #     # merge filterset kwargs provided by view class
+    #     if hasattr(view, "get_filterset_kwargs"):
+    #         kwargs.update(view.get_filterset_kwargs())
+
+    #     return kwargs
+
+
 class NoteItemViewSet(
     ListModelMixin,
     CreateModelMixin,
@@ -126,13 +145,17 @@ class NoteItemViewSet(
 ):
     queryset = NoteItem.objects.all()
 
+    filter_backends = [NoteItemFilterBackend]
+
     def get_serializer_class(self):
         if self.action == "create":
             return NoteItemIndependentSerializer
         else:
             return NoteItemSerializer
 
-    filterset_class = NoteItemFilter
+    def get_queryset(self):
+        user = self.request.user
+        return NoteItem.objects.filter(note__user=user)
 
     """
     create one note_item to a note
