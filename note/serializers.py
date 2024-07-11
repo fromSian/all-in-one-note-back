@@ -63,7 +63,7 @@ class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
         user = self.context["request"].user
         if user != instance.user:
             raise serializers.ValidationError("Permission denied")
-        return self.update(self, instance, validated_data)
+        return super().update(instance, validated_data)
 
 
 # class NoteWithNoteItemWriteSerializer(

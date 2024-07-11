@@ -17,9 +17,10 @@ from rest_framework.mixins import (
 )
 from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.renderers import JSONRenderer
 from drf_yasg.utils import swagger_auto_schema
+from django.core.exceptions import ValidationError
 
 # Create your views here.
 
@@ -143,7 +144,6 @@ class NoteItemViewSet(
     DestroyModelMixin,
     GenericViewSet,
 ):
-    queryset = NoteItem.objects.all()
 
     filter_backends = [NoteItemFilterBackend]
 
@@ -169,3 +169,77 @@ class NoteItemViewSet(
     """
     delete a note item
     """
+
+
+from markdownify import markdownify as md
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from django.utils.timezone import localtime
+from zoneinfo import ZoneInfo
+
+
+@swagger_auto_schema(
+    method="POST",
+    operation_description="get markdown content",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["id"],
+        properties={
+            "id": openapi.Schema(type=openapi.TYPE_NUMBER, description="note id"),
+            "order": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="order",
+            ),
+        },
+    ),
+    responses={
+        status.HTTP_200_OK: openapi.Response(
+            "success", examples={"message": "success"}
+        ),
+        status.HTTP_400_BAD_REQUEST: openapi.Response(
+            "fail", examples={"message": "fail"}
+        ),
+    },
+)
+@permission_classes([permissions.IsAuthenticated])
+@api_view(["POST"])
+def note_content_md(request):
+    try:
+        user = request.user
+        id = request.data.get("id")
+        note = Note.objects.filter(id=id).first()
+
+        if not note:
+            raise ValidationError("Note not found")
+        if note.user != user:
+            raise ValidationError("Permission denied")
+
+        order = request.data.get("order", "-created")
+        order = "-created" if not order else order
+        note_items = NoteItem.objects.filter(note__id=id).order_by(order)
+        markdown_content = ""
+        for note_item in note_items:
+            markdown_content += (
+                "<font size=1 color=#8da2b8>{0}</font>\n\n".format(
+                    localtime(note_item.created, ZoneInfo("Asia/Shanghai")).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                )
+                + md(note_item.content, heading_style="ATX")
+                + "\n\n"
+            )
+        return Response(
+            {"content": markdown_content},
+            status=status.HTTP_200_OK,
+        )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

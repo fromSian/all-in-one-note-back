@@ -1,5 +1,7 @@
 from django.db import models
 from account.models import User
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -43,3 +45,10 @@ class NoteItem(models.Model):
 
     def __str__(self) -> str:
         return self.content
+
+
+@receiver(post_delete, sender=NoteItem)
+@receiver(post_save, sender=NoteItem)
+def add_coins(sender, instance, **kwargs):
+    note = instance.note
+    note.save()
