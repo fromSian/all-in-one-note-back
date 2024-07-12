@@ -17,7 +17,7 @@ class Note(models.Model):
     def note_items(self):
         return NoteItem.objects.filter(note=self)
 
-    def note_items_count(self):
+    def count(self):
         return self.note_items.count()
 
     """
@@ -33,7 +33,7 @@ class Note(models.Model):
         return self.note_items.first().summary if self.note_items else ""
 
     def __str__(self) -> str:
-        return self.titlex
+        return self.title
 
 
 class NoteItem(models.Model):

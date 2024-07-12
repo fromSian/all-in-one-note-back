@@ -20,6 +20,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.renderers import JSONRenderer
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 from django.core.exceptions import ValidationError
 
 # Create your views here.
@@ -27,8 +29,53 @@ from django.core.exceptions import ValidationError
 """note"""
 
 
+class SinceIdPageListMixin:
+    @swagger_auto_schema(
+        operation_description="since id page list",
+        manual_parameters=[
+            openapi.Parameter(
+                "since_id",
+                openapi.IN_QUERY,
+                description="since_id",
+                type=openapi.TYPE_NUMBER,
+            ),
+            openapi.Parameter(
+                "size",
+                openapi.IN_QUERY,
+                description="size",
+                type=openapi.TYPE_NUMBER,
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                "success", examples={"message": "success"}
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response(
+                "fail", examples={"message": "fail"}
+            ),
+        },
+    )
+    def list(self, request, *args, **kwargs):
+        since_id = request.query_params.get("since_id", "")
+        size = int(request.query_params.get("size", "")) | 10
+        queryset = self.filter_queryset(self.get_queryset())
+        start = 0
+        if since_id:
+            since_object = queryset.filter(id=since_id).first()
+            if since_object:
+                start = list(queryset).index(since_object) + 1
+        count = len(queryset)
+        page_queryset = queryset[start : start + size]
+        hasNext = start + size < count
+
+        serializer = self.get_serializer(page_queryset, many=True)
+        return Response(
+            {"results": serializer.data, "count": count, "hasNext": hasNext}
+        )
+
+
 class NoteViewSet(
-    ListModelMixin,
+    SinceIdPageListMixin,
     RetrieveModelMixin,
     CreateModelMixin,
     UpdateModelMixin,
@@ -44,78 +91,6 @@ class NoteViewSet(
 
     def get_serializer_class(self):
         return NoteSerializer
-
-    """
-    query note list
-    pagination
-    side date line
-
-    response includes 'title' 'created' 'updated' 'summary' 'note_list_count
-    """
-
-    """
-    create a note
-
-    params={
-        'title': '',
-        'note_items': [
-            {
-                'content': ''
-            },
-    }
-    """
-    """
-    update title
-    """
-    """
-    delete a note
-    """
-
-    """
-    query note detail note_list
-
-    params note 'id'
-
-    pagination
-
-    response includes 'content' 'sort' 'created' 'updated'
-    """
-
-    # @action(detail=True, methods=["GET"])
-    # def section(self, request, *args, **kwargs):
-    #     try:
-    #         note = self.get_object()
-    #         page = self.paginate_queryset(note.note_items)
-    #         if page is not None:
-    #             serializer = NoteItemSerializer(page, many=True)
-    #             return self.get_paginated_response(serializer.data)
-    #         else:
-    #             serializer = NoteItemSerializer(note.note_items, many=True)
-    #             return Response(serializer.data, status=status.HTTP_200_OK)
-    #     except Exception as e:
-    #         return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-    """
-    haven't finish
-    '全量替换‘
-    update a note
-
-    deleted_note_id
-    note_items: 
-    {
-    id: {
-    content
-    }
-    }
-    if no id is removed
-
-    to new add note_item must setting the id with 'add_1/2/3/4'
-
-    will replace the sort but later write this part.
-    """
-
-    # def update(self, request, *args, **kwargs):
-    #     return super().update(request, *args, **kwargs)
 
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -138,7 +113,7 @@ class NoteItemFilterBackend(DjangoFilterBackend):
 
 
 class NoteItemViewSet(
-    ListModelMixin,
+    SinceIdPageListMixin,
     CreateModelMixin,
     UpdateModelMixin,
     DestroyModelMixin,
@@ -146,6 +121,7 @@ class NoteItemViewSet(
 ):
 
     filter_backends = [NoteItemFilterBackend]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "create":

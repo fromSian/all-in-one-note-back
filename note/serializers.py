@@ -38,7 +38,7 @@ class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
             "id",
             "title",
             "summary",
-            "note_items_count",
+            "count",
             "created",
             "updated",
             "user",
@@ -48,7 +48,7 @@ class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
             "created",
             "summary",
             "updated",
-            "note_items_count",
+            "count",
             "user",
         ]
         encryption_class = AESEncryption

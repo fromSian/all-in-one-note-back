@@ -145,7 +145,8 @@ REST_FRAMEWORK = {
         # "rest_framework_simplejwt.authentication.JWTAuthentication",
         "utils.authentication.RedisJWTAuthentication",
     ],
-    "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
+    # "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
+    "DEFAULT_PAGINATION_CLASS": None,
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S %Z",
     # "EXCEPTION_HANDLER": "utils.exception.custom_exception_handler",
 }
