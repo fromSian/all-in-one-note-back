@@ -285,10 +285,9 @@ def trial(request):
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
             user = serializer.save()
-            print(user, serializer.data)
             access_token = login_token_logic(user, 60 * 60 * 1)
             return Response(
-                {"message": "trial success", "token": access_token},
+                {"message": "trial success", "token": access_token, **serializer.data},
                 status=status.HTTP_202_ACCEPTED,
             )
         else:

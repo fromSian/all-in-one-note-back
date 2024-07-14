@@ -184,7 +184,6 @@ def note_content_md(request):
         user = request.user
         id = request.data.get("id")
         note = Note.objects.filter(id=id).first()
-
         if not note:
             raise ValidationError("Note not found")
         if note.user != user:
