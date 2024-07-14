@@ -288,7 +288,7 @@ def trial(request):
             print(user, serializer.data)
             access_token = login_token_logic(user, 60 * 60 * 1)
             return Response(
-                {"message": "login success", "access_token": access_token},
+                {"message": "trial success", "token": access_token},
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
@@ -708,7 +708,6 @@ get account information
 def info(request):
     try:
         user = request.user
-        print(user, user.avatar)
         serializer = UserSerializer(instance=user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ValidationError as e:
