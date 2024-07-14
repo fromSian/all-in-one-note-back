@@ -11,3 +11,12 @@ def to_readable_str(value):
         return ".".join("{0}: {1}".format(key, v) for (key, v) in value.items())
     else:
         return str(value)
+
+
+import random, string
+
+
+def random_word(length):
+    letters = string.ascii_lowercase
+    numbers = string.digits
+    return "".join(random.choice(letters + numbers) for i in range(length))

@@ -16,9 +16,14 @@ single_views = [
         "name": "google-callback",
     },
     {
-        "route": "send-vertification-code/",
-        "view": views.send_vertification_code,
-        "name": "send-vertification-code",
+        "route": "send-code/",
+        "view": views.send_code,
+        "name": "send-code",
+    },
+    {
+        "route": "verify-code/",
+        "view": views.verify_code,
+        "name": "verify-code",
     },
     {
         "route": "register/",

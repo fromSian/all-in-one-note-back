@@ -13,7 +13,8 @@ from rest_framework.response import Response
 from rest_framework import status, permissions, parsers
 from rest_framework.renderers import BrowsableAPIRenderer
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail, BadHeaderError
+from smtplib import SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 from django.utils.regex_helper import _lazy_re_compile
@@ -30,6 +31,7 @@ from datetime import timedelta
 
 from utils.authentication import check_operation_validation
 from utils.file import handle_uploaded_file
+from utils.string import random_word
 from uuid import uuid4
 
 # Create your views here.
@@ -129,19 +131,22 @@ def code_validator(value):
         )
 
 
+def check_email_exist(email):
+    return User.objects.filter(email=email).exists()
+
+
 @swagger_auto_schema(
     method="POST",
     operation_description="send vertification code to email",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=["email", "code"],
+        required=["email"],
         properties={
             "email": openapi.Schema(
                 type=openapi.TYPE_STRING, description="to email address"
             ),
-            "code": openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description="vertification code",
+            "register": openapi.Schema(
+                type=openapi.TYPE_BOOLEAN, description="is for register"
             ),
         },
     ),
@@ -155,27 +160,101 @@ def code_validator(value):
     },
 )
 @api_view(["POST"])
-def send_vertification_code(request):
+def send_code(request):
     try:
-        email = request.data.get("email")
-        code = request.data.get("code")
-        if email is None or code is None:
-            raise ValidationError("email or code is None")
+        email = request.data.get("email", "")
+        register = request.data.get("register", True)
         email_validator(email)
-        code_validator(code)
-        send_mail(
-            subject="notes & todos 😺",
-            message=code,
+        if register and check_email_exist(email):
+            return Response(
+                {"message": "email already registered"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        code = random_word(6)
+        cache.set(email + "code", code, timeout=3600)  # 1 hour
+        flag = send_mail(
+            subject="email validation - notes & todos 😺",
+            message="",
+            html_message="""
+            Hi, it is be-notes. glad to have you signed up.
+            <p>verification code: <strong>{0}</strong></p>
+            <p>this code expires in <strong>1 hour</strong></p>
+            <p>please copy and paste this code into the input field in the app.</p>
+            """.format(
+                code
+            ),
             from_email="notetodos@163.com",
             recipient_list=[email],
-            fail_silently=False,
+            fail_silently=True,
         )
+        if flag:
+            return Response(
+                {
+                    "message": "send verification code to email success",
+                },
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {
+                    "message": "send email failed, please check the email address and try again."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValidationError as e:
+        print("fail", e)
         return Response(
-            {
-                "message": "send vertification code to email success",
-            },
-            status=status.HTTP_200_OK,
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
         )
+    except Exception as e:
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+@swagger_auto_schema(
+    method="POST",
+    operation_description="verify code",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["email", "code"],
+        properties={
+            "email": openapi.Schema(
+                type=openapi.TYPE_STRING, description="to email address"
+            ),
+            "code": openapi.Schema(type=openapi.TYPE_STRING, description="code"),
+        },
+    ),
+    responses={
+        status.HTTP_200_OK: openapi.Response(
+            "success", examples={"message": "success"}
+        ),
+        status.HTTP_400_BAD_REQUEST: openapi.Response(
+            "fail", examples={"message": "fail"}
+        ),
+    },
+)
+@api_view(["POST"])
+def verify_code(request):
+    try:
+        email = request.data.get("email", "")
+        email_validator(email)
+        enter_code = request.data.get("code", "")
+        code_validator(enter_code)
+        code = cache.get(email + "code")
+        if code == enter_code:
+            cache.delete(email + "code")
+            return Response(
+                {"message": "code is correct"},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"message": "code is incorrect"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
     except ValidationError as e:
         print("fail", e)
         return Response(
