@@ -183,6 +183,7 @@ def note_content_md(request):
     try:
         user = request.user
         id = request.data.get("id")
+        timezone = request.data.get("timezone", "Asia/Shanghai")
         note = Note.objects.filter(id=id).first()
         if not note:
             raise ValidationError("Note not found")
@@ -192,16 +193,27 @@ def note_content_md(request):
         order = request.data.get("order", "-created")
         order = "-created" if not order else order
         note_items = NoteItem.objects.filter(note__id=id).order_by(order)
-        markdown_content = ""
+        markdown_content = """# {0} \n\n<div style='display: flex; justify-content: end; color: #8da2b8; font-size: 10px'>{1} {2}</div>\n\n""".format(
+            note.title,
+            localtime(note.created, ZoneInfo(timezone)).strftime(
+                "%Y-%m-%d %H:%M:%S %Z"
+            ),
+            localtime(note.updated, ZoneInfo(timezone)).strftime(
+                "%Y-%m-%d %H:%M:%S %Z"
+            ),
+        )
         for note_item in note_items:
             markdown_content += (
-                "<font size=1 color=#8da2b8>{0}</font>\n\n".format(
-                    localtime(note_item.created, ZoneInfo("Asia/Shanghai")).strftime(
-                        "%Y-%m-%d %H:%M:%S"
-                    )
+                md(note_item.content, heading_style="ATX")
+                + "<div style='display: flex; justify-content: end; color: #8da2b8; font-size: 10px'>{0} {1}</div>\n\n".format(
+                    localtime(note_item.created, ZoneInfo(timezone)).strftime(
+                        "%Y-%m-%d %H:%M:%S %Z"
+                    ),
+                    localtime(note_item.updated, ZoneInfo(timezone)).strftime(
+                        "%Y-%m-%d %H:%M:%S %Z"
+                    ),
                 )
-                + md(note_item.content, heading_style="ATX")
-                + "\n\n"
+                + "<div style='border: dashed 1px rgba(255, 255, 255, 0.2); margin: 8px 0px;'></div>\n\n"
             )
         return Response(
             {"content": markdown_content},
