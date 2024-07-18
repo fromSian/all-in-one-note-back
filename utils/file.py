@@ -42,11 +42,9 @@ from PIL import Image
 
 
 def crop(file, crop_tuple):
-    print(crop_tuple)
     file_name = uuid.uuid4().hex
     file_extension = os.path.splitext(file.name)[1]
     file_path = os.path.join(settings.MEDIA_URL, file_name + file_extension)
-    print(file_path)
     with Image.open(file) as im:
         im_crop = im.crop(crop_tuple)
         im_crop.save("media/" + file_name + file_extension)

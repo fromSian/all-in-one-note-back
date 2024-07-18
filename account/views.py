@@ -383,7 +383,7 @@ log out
 
 
 def logout_logic(key):
-    isDeleted = cache.delete(key) if cache.has_key(key) else True
+    isDeleted = cache.expire(key, timeout=8) if cache.has_key(key) else True
     return isDeleted
 
 
@@ -591,7 +591,6 @@ def email(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as e:
-        print(123, e)
         return Response(
             {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
@@ -805,7 +804,6 @@ def upload_avatar(request):
         if serialzer.is_valid():
             loaded_file = serialzer.validated_data.get("file")
             path = handle_uploaded_file(loaded_file, loaded_file.name)
-            print(path)
             return Response(
                 {"url": request.build_absolute_uri(path)},
                 status=status.HTTP_202_ACCEPTED,
@@ -813,6 +811,129 @@ def upload_avatar(request):
         else:
             return Response(
                 {"message": serialzer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+"""
+convert account type to base
+"""
+
+
+@swagger_auto_schema(
+    method="POST",
+    operation_description="convert account type, trial to base",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["email", "password"],
+        properties={
+            "email": openapi.Schema(type=openapi.TYPE_STRING, description="email"),
+            "password": openapi.Schema(
+                type=openapi.TYPE_STRING, description="password"
+            ),
+        },
+    ),
+    responses={
+        status.HTTP_202_ACCEPTED: "success",
+        status.HTTP_400_BAD_REQUEST: "fail",
+    },
+)
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def trial_to_base(request):
+    try:
+        user = request.user
+        password = request.data.get("password", "")
+        email = request.data.get("email", "")
+        email_validator(email)
+        if not email or not password:
+            return Response(
+                {"message": "email and password is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if user.type == "trial":
+            user.email = email
+            user.type = "base"
+            user.set_password(password)
+            user.save()
+            password_changed(password, user=user)
+            logout_logic(user.email)
+            user.save()
+            return Response(
+                {"message": "account type converted to base"},
+                status=status.HTTP_202_ACCEPTED,
+            )
+        else:
+            return Response(
+                {"message": "you are not a trial user"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+@swagger_auto_schema(
+    method="POST",
+    operation_description="convert account type, google to base",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["password"],
+        properties={
+            "password": openapi.Schema(
+                type=openapi.TYPE_STRING, description="password"
+            ),
+        },
+    ),
+    responses={
+        status.HTTP_202_ACCEPTED: "success",
+        status.HTTP_400_BAD_REQUEST: "fail",
+    },
+)
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def google_to_base(request):
+    try:
+        user = request.user
+        password = request.data.get("password", "")
+        if not password:
+            return Response(
+                {"message": "email and password is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if user.type == "google":
+            user.type = "base"
+            user.set_password(password)
+            user.save()
+            password_changed(password, user=user)
+            logout_logic(user.email)
+            user.save()
+            return Response(
+                {"message": "account type converted to base"},
+                status=status.HTTP_202_ACCEPTED,
+            )
+        else:
+            return Response(
+                {"message": "you are not a google user"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except ValidationError as e:

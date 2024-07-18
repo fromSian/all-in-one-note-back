@@ -75,6 +75,16 @@ single_views = [
         "view": views.trial,
         "name": "trial",
     },
+    {
+        "route": "trial-base/",
+        "view": views.trial_to_base,
+        "name": "trail_to_base",
+    },
+    {
+        "route": "google-base/",
+        "view": views.google_to_base,
+        "name": "google_to_base",
+    },
 ]
 
 router = RouterWithSingleView(single_views=single_views)
