@@ -21,7 +21,8 @@ from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import authenticate
 from django.core.cache import cache
-
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import password_changed, validate_password
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -30,7 +31,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import timedelta
 
 from utils.authentication import check_operation_validation
-from utils.file import handle_uploaded_file
+from utils.file import handle_uploaded_file, crop
 from utils.string import random_word
 from uuid import uuid4
 
@@ -395,10 +396,13 @@ def logout_logic(key):
     },
 )
 @api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
+# @permission_classes([permissions.IsAuthenticated])
 def logout(request):
     try:
         user = request.user
+        if not user:
+            return Response({"message": "not login"}, status.HTTP_400_BAD_REQUEST)
+
         isDeleted = logout_logic(user.email)
 
         if isDeleted:
@@ -500,6 +504,8 @@ class PasswordView(APIView):
             password = request.data.get("password")
             user = request.user
             user.set_password(password)
+            user.save()
+            password_changed(password, user=user)
             logout_logic(user.email)
             return Response(
                 {"message": "password changed"},
@@ -607,7 +613,35 @@ change avatar
             type=openapi.TYPE_FILE,
             required=True,
             description="avatar file",
-        )
+        ),
+        openapi.Parameter(
+            name="left",
+            in_=openapi.IN_FORM,
+            type=openapi.TYPE_NUMBER,
+            required=True,
+            description="left",
+        ),
+        openapi.Parameter(
+            name="upper",
+            in_=openapi.IN_FORM,
+            type=openapi.TYPE_NUMBER,
+            required=True,
+            description="upper",
+        ),
+        openapi.Parameter(
+            name="right",
+            in_=openapi.IN_FORM,
+            type=openapi.TYPE_NUMBER,
+            required=True,
+            description="right",
+        ),
+        openapi.Parameter(
+            name="lower",
+            in_=openapi.IN_FORM,
+            type=openapi.TYPE_NUMBER,
+            required=True,
+            description="lower",
+        ),
     ],
     responses={
         status.HTTP_202_ACCEPTED: "success",
@@ -623,13 +657,22 @@ def avatar(request):
         if avatar_file is None:
             raise ValidationError("avatar file is required")
         user = request.user
-        serializer = UserSerializer(
-            instance=user, data={"avatar": avatar_file}, partial=True
+        # if user.type == "trial":
+        #     raise ValidationError("trial user can't change avatar")
+        crop_tuple = (
+            float(request.data.get("left", 0)),
+            float(request.data.get("upper", 0)),
+            float(request.data.get("right", 100)),
+            float(request.data.get("lower", 100)),
         )
+        file_path = crop(avatar_file, crop_tuple)
+        url = request.build_absolute_uri(file_path)
+        serializer = UserSerializer(instance=user, data={"image": url}, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {"message": "avatar changed"}, status=status.HTTP_202_ACCEPTED
+                {"message": "avatar changed", **serializer.data},
+                status=status.HTTP_202_ACCEPTED,
             )
         else:
             return Response(
