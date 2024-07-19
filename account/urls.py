@@ -85,6 +85,11 @@ single_views = [
         "view": views.google_to_base,
         "name": "google_to_base",
     },
+    {
+        "route": "settings/",
+        "view": views.SettingView.as_view(),
+        "name": "settings",
+    },
 ]
 
 router = RouterWithSingleView(single_views=single_views)

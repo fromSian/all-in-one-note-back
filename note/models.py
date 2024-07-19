@@ -49,6 +49,6 @@ class NoteItem(models.Model):
 
 @receiver(post_delete, sender=NoteItem)
 @receiver(post_save, sender=NoteItem)
-def add_coins(sender, instance, **kwargs):
+def update_datetime(sender, instance, **kwargs):
     note = instance.note
     note.save()

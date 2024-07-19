@@ -4,6 +4,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.exceptions import ValidationError
 from utils.file import get_size, image_content_types
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -74,3 +76,40 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+
+class Settings(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    defaultExpanded = models.BooleanField(default=True)
+    showExactTime = models.BooleanField(default=False)
+
+    SORT_CHOICES = (
+        ("updated", "updated ascending"),
+        ("-updated", "updated descending"),
+        ("created", "created ascending"),
+        ("-created", "created descending"),
+    )
+
+    sortInfo = models.CharField(default="-updated", choices=SORT_CHOICES)
+
+    LANGUAGE_CHOICES = (
+        ("", "none"),
+        ("en", "English"),
+        ("zh-cn", "simplified Chinese"),
+        ("zh-tw", "traditional Chinese"),
+    )
+    language = models.CharField(default="", choices=LANGUAGE_CHOICES)
+
+    THEME_CHOICES = (
+        ("", "none"),
+        ("dark", "dark"),
+        ("light", "light"),
+        ("system", "system"),
+    )
+    theme = models.CharField(default="", choices=THEME_CHOICES)
+
+
+@receiver(post_save, sender=User)
+def create_settings(sender, instance, created, **kwargs):
+    if created:
+        setting = Settings.objects.create(user=instance)

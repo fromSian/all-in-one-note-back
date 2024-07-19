@@ -1,11 +1,19 @@
 from rest_framework import serializers
 from utils.serializers import EncryptSerializerMixin
 from utils.encryption import RSAEncryption
-from .models import User
+from .models import User, Settings
 from django.contrib.auth.models import Group
 from rest_framework.serializers import ImageField
 from utils.file import get_size, image_content_types, handle_uploaded_file
 from rest_framework.exceptions import ValidationError
+
+
+class SettingsSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
+
+    class Meta:
+        model = Settings
+        exclude = ("user", "id")
+        encryption_class = RSAEncryption
 
 
 class UserSerializer(EncryptSerializerMixin, serializers.ModelSerializer):

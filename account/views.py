@@ -1,6 +1,9 @@
-from .models import User
-from .serializers import UserSerializer, ImageFileSerializer
-
+from .models import User, Settings
+from .serializers import UserSerializer, ImageFileSerializer, SettingsSerializer
+from rest_framework.mixins import (
+    UpdateModelMixin,
+    RetrieveModelMixin,
+)
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.decorators import (
@@ -361,12 +364,21 @@ def login(request):
         if user.type == "trial":
             raise ValidationError("sorry, you are not allowed to login")
         serializer = UserSerializer(user)
+        setting = Settings.objects.filter(user=user).first()
+        if not setting:
+            setting = Settings.objects.create(user=user)
+        setting_serializer = SettingsSerializer(setting)
+
         access_token = login_token_logic(user, valid_seconds=7 * 24 * 60 * 60)
         serializer_data = serializer.data
         serializer_data["token"] = access_token
 
         return Response(
-            {"message": "log in successfully", **serializer_data},
+            {
+                "message": "log in successfully",
+                **serializer_data,
+                **setting_serializer.data,
+            },
             status=status.HTTP_202_ACCEPTED,
         )
     except ValidationError as e:
@@ -750,7 +762,13 @@ def info(request):
     try:
         user = request.user
         serializer = UserSerializer(instance=user, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        setting = Settings.objects.filter(user=user).first()
+        if not setting:
+            setting = Settings.objects.create(user=user)
+        setting_serializer = SettingsSerializer(setting)
+        return Response(
+            {**serializer.data, **setting_serializer.data}, status=status.HTTP_200_OK
+        )
     except ValidationError as e:
         print(e)
         return Response(
@@ -762,12 +780,6 @@ def info(request):
             {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
-
-
-class TestViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    # permission_classes = [permissions.IsAuthenticated]
 
 
 """
@@ -947,3 +959,105 @@ def google_to_base(request):
             {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class SettingView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="get settings",
+        responses={
+            status.HTTP_200_OK: SettingsSerializer,
+            status.HTTP_400_BAD_REQUEST: openapi.Response(
+                "fail", examples={"message": "fail"}
+            ),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            settings = Settings.objects.filter(user=user).first()
+            if not settings:
+                raise ValidationError("No settings record found")
+            serializer = SettingsSerializer(settings)
+            return Response(
+                serializer.data,
+                status=status.HTTP_202_ACCEPTED,
+            )
+        except ValidationError as e:
+            print(e)
+            return Response(
+                {"message": e.message},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            print(e)
+            return Response(
+                {"message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @swagger_auto_schema(
+        operation_description="update settings",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=[],
+            properties={
+                "defaultExpanded": openapi.Schema(
+                    type=openapi.TYPE_BOOLEAN, description="defaultExpanded"
+                ),
+                "showExactTime": openapi.Schema(
+                    type=openapi.TYPE_BOOLEAN, description="showExactTime"
+                ),
+                "sortInfo": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="sortInfo"
+                ),
+                "language": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="language"
+                ),
+                "theme": openapi.Schema(type=openapi.TYPE_STRING, description="theme"),
+            },
+        ),
+        responses={
+            status.HTTP_202_ACCEPTED: SettingsSerializer,
+            status.HTTP_400_BAD_REQUEST: openapi.Response(
+                "fail", examples={"message": "fail"}
+            ),
+        },
+    )
+    def patch(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            settings = Settings.objects.filter(user=user).first()
+            if not settings:
+                raise ValidationError("No settings record found")
+            serializer = SettingsSerializer(settings, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_202_ACCEPTED,
+                )
+            else:
+                return Response(
+                    serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except ValidationError as e:
+            print(e)
+            return Response(
+                {"message": e.message},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            print(e)
+            return Response(
+                {"message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class TestViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    # permission_classes = [permissions.IsAuthenticated]
