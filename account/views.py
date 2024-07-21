@@ -15,7 +15,7 @@ from rest_framework.decorators import (
 from rest_framework.response import Response
 from rest_framework import status, permissions, parsers
 from rest_framework.renderers import BrowsableAPIRenderer
-
+from utils.permission import RequestValidPermission
 from django.core.mail import send_mail, BadHeaderError
 from smtplib import SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
 from django.core.validators import EmailValidator
@@ -33,7 +33,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from datetime import timedelta
 
-from utils.authentication import check_operation_validation
 from utils.file import handle_uploaded_file, crop
 from utils.string import random_word
 from uuid import uuid4
@@ -290,8 +289,17 @@ def trial(request):
         if serializer.is_valid():
             user = serializer.save()
             access_token = login_token_logic(user, 60 * 60 * 1)
+            setting = Settings.objects.filter(user=user).first()
+            if not setting:
+                setting = Settings.objects.create(user=user)
+            setting_serializer = SettingsSerializer(setting)
             return Response(
-                {"message": "trial success", "token": access_token, **serializer.data},
+                {
+                    "message": "trial success",
+                    "token": access_token,
+                    **serializer.data,
+                    **setting_serializer.data,
+                },
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
@@ -347,7 +355,6 @@ log in
     },
 )
 @api_view(["POST"])
-@permission_classes([permissions.AllowAny])
 def login(request):
     try:
         user_data = request.data
@@ -408,7 +415,6 @@ def logout_logic(key):
     },
 )
 @api_view(["POST"])
-# @permission_classes([permissions.IsAuthenticated])
 def logout(request):
     try:
         user = request.user
@@ -429,7 +435,7 @@ def logout(request):
 
 
 class PasswordView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [RequestValidPermission, permissions.IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="verify password",
@@ -575,10 +581,6 @@ if success log out
 @api_view(["PUT"])
 def email(request):
     try:
-        expire_time = request.data.get("expire_time")
-        action_time = request.data.get("action_time")
-        check_operation_validation(expire_time, action_time)
-
         email = request.data.get("email")
         user = request.user
         email_bak = user.email
@@ -661,7 +663,7 @@ change avatar
 )
 @api_view(["PUT"])
 @parser_classes([parsers.MultiPartParser])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([RequestValidPermission, permissions.IsAuthenticated])
 def avatar(request):
     try:
         avatar_file = request.data.get("file", None)
@@ -724,7 +726,7 @@ change bio
     },
 )
 @api_view(["PUT"])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([RequestValidPermission, permissions.IsAuthenticated])
 def bio(request):
     try:
         bio = request.data.get("bio", "")
@@ -757,7 +759,7 @@ get account information
 
 
 @api_view(["GET"])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([RequestValidPermission, permissions.IsAuthenticated])
 def info(request):
     try:
         user = request.user
@@ -862,7 +864,7 @@ convert account type to base
     },
 )
 @api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([RequestValidPermission, permissions.IsAuthenticated])
 def trial_to_base(request):
     try:
         user = request.user
@@ -922,7 +924,7 @@ def trial_to_base(request):
     },
 )
 @api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([RequestValidPermission, permissions.IsAuthenticated])
 def google_to_base(request):
     try:
         user = request.user
@@ -962,7 +964,7 @@ def google_to_base(request):
 
 
 class SettingView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [RequestValidPermission, permissions.IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="get settings",
@@ -1057,7 +1059,10 @@ class SettingView(APIView):
             )
 
 
+from utils.permission import RequestValidPermission
+
+
 class TestViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [RequestValidPermission]

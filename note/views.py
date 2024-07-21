@@ -5,6 +5,7 @@ from .serializers import (
 )
 from .models import Note, NoteItem
 from .filters import NoteFilter, NoteItemFilter
+from utils.permission import RequestValidPermission
 
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
@@ -82,7 +83,7 @@ class NoteViewSet(
     DestroyModelMixin,
     GenericViewSet,
 ):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [RequestValidPermission, permissions.IsAuthenticated]
     filterset_class = NoteFilter
 
     def get_queryset(self):
@@ -121,7 +122,7 @@ class NoteItemViewSet(
 ):
 
     filter_backends = [NoteItemFilterBackend]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [RequestValidPermission, permissions.IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -177,7 +178,7 @@ from zoneinfo import ZoneInfo
         ),
     },
 )
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([RequestValidPermission, permissions.IsAuthenticated])
 @api_view(["POST"])
 def note_content_md(request):
     try:

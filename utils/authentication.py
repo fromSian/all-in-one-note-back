@@ -4,16 +4,10 @@ from django.core.cache import cache
 
 from rest_framework_simplejwt.exceptions import InvalidToken
 
-from rest_framework.exceptions import ValidationError
-from datetime import datetime, timedelta
-from django.utils import timezone
-from django.conf import settings
-from django.utils.dateparse import parse_datetime
-
 
 class RedisJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
-        
+
         header = self.get_header(request)
         if header is None:
             return None
@@ -30,27 +24,3 @@ class RedisJWTAuthentication(JWTAuthentication):
             return user, validated_token
         else:
             raise InvalidToken()
-
-
-def check_operation_validation(expire_time, action_time):
-    """
-    check if the operation is valid
-    for change pasword or email...
-
-    expire_time and action_time need to be encrypted
-    """
-    datetime_timezone_format = getattr(
-        settings, "DATETIME_TIMEZONE_FORMAT", "%Y-%m-%d %H:%M:%S %z"
-    )
-    if expire_time is None or action_time is None:
-        raise Exception("expire_time and action_time must not be blank")
-
-    now = timezone.now()
-    expire = datetime.strptime(expire_time, datetime_timezone_format)
-    print(now, expire)
-    if expire < now:
-        raise Exception("operation passkey already expired")
-
-    action = datetime.strptime(action_time, datetime_timezone_format)
-    if action < now - timedelta(seconds=10):
-        raise Exception("action timeout")

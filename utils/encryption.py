@@ -1,5 +1,5 @@
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Cipher import PKCS1_v1_5
 from base64 import b64encode, b64decode
 
 from Crypto.Cipher import AES
@@ -22,14 +22,17 @@ class RSAEncryption:
 
     def encrypt(self, text):
         public_key = RSA.importKey(self.PUBLIC_KEY)
-        cipher = PKCS1_OAEP.new(public_key)
+        cipher = PKCS1_v1_5.new(public_key)
         encrypted_text = cipher.encrypt(text.encode("utf-8"))
+        print(encrypted_text)
         return b64encode(encrypted_text)
 
     def decrypt(self, text):
         private_key = RSA.importKey(self.PRIVATE_KEY)
-        cipher = PKCS1_OAEP.new(private_key)
-        decrypted_text = cipher.decrypt(b64decode(text))
+        cipher = PKCS1_v1_5.new(private_key)
+        decrypted_text = cipher.decrypt(b64decode(text), get_random_bytes(32))
+        # decrypted_text = cipher.decrypt(text)
+        print(text, decrypted_text)
         return decrypted_text
 
     def _get_public_key(self):
