@@ -6,7 +6,7 @@ from .serializers import (
 from .models import Note, NoteItem
 from .filters import NoteFilter, NoteItemFilter
 from utils.permission import RequestValidPermission
-
+from utils.encryption import AESEncryption
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import (
@@ -191,27 +191,28 @@ def note_content_md(request):
         if note.user != user:
             raise ValidationError("Permission denied")
 
+        encryption = AESEncryption()
         order = request.data.get("order", "-created")
         order = "-created" if not order else order
         note_items = NoteItem.objects.filter(note__id=id).order_by(order)
         markdown_content = """# {0} \n\n<div style='display: flex; justify-content: end; color: #8da2b8; font-size: 10px'>{1} {2}</div>\n\n""".format(
-            note.title,
+            encryption.decrypt(note.title),
             localtime(note.created, ZoneInfo(timezone)).strftime(
-                "%Y-%m-%d %H:%M:%S %Z"
+                "%Y-%m-%d %H:%M:%S %z"
             ),
             localtime(note.updated, ZoneInfo(timezone)).strftime(
-                "%Y-%m-%d %H:%M:%S %Z"
+                "%Y-%m-%d %H:%M:%S %z"
             ),
         )
         for note_item in note_items:
             markdown_content += (
-                md(note_item.content, heading_style="ATX")
+                md(encryption.decrypt(note_item.content), heading_style="ATX")
                 + "<div style='display: flex; justify-content: end; color: #8da2b8; font-size: 10px'>{0} {1}</div>\n\n".format(
                     localtime(note_item.created, ZoneInfo(timezone)).strftime(
-                        "%Y-%m-%d %H:%M:%S %Z"
+                        "%Y-%m-%d %H:%M:%S %z"
                     ),
                     localtime(note_item.updated, ZoneInfo(timezone)).strftime(
-                        "%Y-%m-%d %H:%M:%S %Z"
+                        "%Y-%m-%d %H:%M:%S %z"
                     ),
                 )
                 + "<div style='border: dashed 1px rgba(255, 255, 255, 0.2); margin: 8px 0px;'></div>\n\n"

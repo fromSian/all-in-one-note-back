@@ -12,6 +12,7 @@ class EncryptSerializerMixin:
     def _get_encrypt_fields(self, representation):
         encrypted_fields = getattr(self.Meta, "encrypt_fields", None)
         excluded_fields = getattr(self.Meta, "excluded_fields", None)
+        read_only_fields = getattr(self.Meta, "read_only_fields", None)
         field_list = list()
         model_class = getattr(self.Meta, "model")
 
@@ -38,7 +39,10 @@ class EncryptSerializerMixin:
             field_list = [key for key, value in representation.items()]
         else:
             for field in encrypted_fields:
-                if not (field in representation.keys()):
+                if (
+                    not (field in representation.keys())
+                    and field not in read_only_fields
+                ):
                     raise ImproperlyConfigured(
                         "Field name `%s` is not valid for model `%s`."
                         % (field, model_class.__name__)
@@ -69,9 +73,9 @@ class EncryptSerializerMixin:
         self.encryption = getattr(self.Meta, "encryption_class")()
 
         for key, value in representation.items():
-            if key in field_list:
+            if key in field_list and value:
                 if isinstance(representation[key], str):
-                    representation[key] = self.encryption.encrypt(value)
+                    representation[key] = self.encryption.decrypt(value)
                 else:
                     raise ImproperlyConfigured(
                         "Field name `%s` is not able to be encrypted for model `%s`."
@@ -91,12 +95,12 @@ class EncryptSerializerMixin:
 
         _data = data.copy()
         for key, value in _data.items():
-            if key in field_list:
-                if isinstance(value, str):
-                    _data.__setitem__(key, self.encryption.decrypt(value))
+            if key in field_list and value:
+                if isinstance(value, str) and value != "":
+                    _data.__setitem__(key, self.encryption.encrypt(value))
                 else:
                     raise ImproperlyConfigured(
-                        "Field name `%s` is not able to be decrypted for model `%s`."
+                        "Field name `%s` is not able to be decrypt for model `%s`."
                         % (key, model_class.__name__)
                     )
         return super().to_internal_value(_data)

@@ -10,7 +10,7 @@ class NoteItemSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
         fields = ("id", "content", "note", "created", "updated", "summary")
         read_only_fields = ["id", "created", "updated", "note"]
         encryption_class = AESEncryption
-        # encrypt_fields = ("content",)
+        encrypt_fields = ("content", "summary")
 
 
 class NoteItemIndependentSerializer(
@@ -25,7 +25,7 @@ class NoteItemIndependentSerializer(
             "updated",
         ]
         encryption_class = AESEncryption
-        # encrypt_fields = ("content",)
+        encrypt_fields = ("content", "summary")
 
         # validate note user is the same
 
@@ -52,7 +52,7 @@ class NoteSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
             "user",
         ]
         encryption_class = AESEncryption
-        # encrypt_fields = ("title", "summary")
+        encrypt_fields = ("summary", "title")
 
     def create(self, validated_data):
         user = self.context["request"].user

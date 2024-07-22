@@ -6,7 +6,6 @@ from Crypto.Random import get_random_bytes
 def encrypt(plaintext, key):
     # Generate a random initialization vector (IV)
     iv = get_random_bytes(AES.block_size)
-    print(AES.block_size)
     # Create an AES cipher object with the key and AES.MODE_CBC mode
     cipher = AES.new(key, AES.MODE_CBC, iv)
     # Pad the plaintext and encrypt it
@@ -52,7 +51,7 @@ class AESEncryption:
         self.Key = str.encode(os.environ.get("AES_KEY", ""))
 
     def encrypt(self, text):
-        text = bytes(text, 'utf-8')
+        text = bytes(text, "utf-8")
         iv = get_random_bytes(AES.block_size)
         # Create an AES cipher object with the key and AES.MODE_CBC mode
         cipher = AES.new(self.Key, AES.MODE_CBC, iv)

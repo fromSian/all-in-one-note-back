@@ -24,7 +24,6 @@ def check_operation_validation(expire_time, action_time):
         return False
     now = timezone.now()
     expire = datetime.strptime(expire_time, datetime_timezone_format)
-    print(now, expire)
     if expire < now:
         # raise Exception("operation passkey already expired")
         return False
