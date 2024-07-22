@@ -1,0 +1,171 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-07-22 18:41+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: account/admin.py:14
+msgid "Permissions"
+msgstr ""
+
+#: account/admin.py:25
+msgid "Important dates"
+msgstr ""
+
+#: account/models.py:17
+#, python-format
+msgid "%(value)s is larger than 2.5MB"
+msgstr "%(value)s 超过2.5MB"
+
+#: account/models.py:26 account/serializers.py:73
+#, python-format
+msgid "%(value)s is not the valid type"
+msgstr "%(value)s 非有效文件格式"
+
+#: account/models.py:49
+msgid "Superuser must be assigned to is_staff=True"
+msgstr "超级用户必须is_staff=True"
+
+#: account/models.py:51
+msgid "Superuser must be assigned to is_superuser=True"
+msgstr "超级用户必须is_superuser=True"
+
+#: account/serializers.py:58
+#, python-format
+msgid "%(value)s is larger than %(size)sMB"
+msgstr "%(value)s 超过 %(size)sMB"
+
+#: account/views.py:93
+msgid "sign up successfully"
+msgstr "注册成功"
+
+#: account/views.py:134
+msgid ""
+"not the valid type, please enter a six character string only include letters "
+"or numbers."
+msgstr "密码格式错误，至少包括六位字符"
+
+#: account/views.py:178
+msgid "This email already signed up, please sign in or check your email"
+msgstr "邮箱已经注册过，请登录或再次确认邮箱"
+
+#: account/views.py:186
+msgid "email validation - be markdown notes"
+msgstr "邮箱验证 —— be markdown notes"
+
+#: account/views.py:203
+msgid "send verification code to email successfully"
+msgstr "邮箱验证码发送成功"
+
+#: account/views.py:211
+msgid "send email failed, please check the email address and try again."
+msgstr "邮箱验证码发送失败，请确认邮箱后再次尝试"
+
+#: account/views.py:262
+msgid "code verifies successfully"
+msgstr "验证成功"
+
+#: account/views.py:267
+msgid "code is incorrect"
+msgstr "验证码错误"
+
+#: account/views.py:307
+msgid "trial successfully"
+msgstr "免登录试用成功"
+
+#: account/views.py:374
+msgid "Invalid email or password"
+msgstr "错误的邮箱或密码"
+
+#: account/views.py:377
+msgid "not accessible for front signin"
+msgstr "该用户不支持前台登录"
+
+#: account/views.py:380
+msgid "please use the sign in with google"
+msgstr "请通过google登录"
+
+#: account/views.py:383
+msgid "sorry, this trial account has destroyed"
+msgstr "您的免登录试用账户已销毁"
+
+#: account/views.py:396
+msgid "sign in successfully"
+msgstr "登录成功"
+
+#: account/views.py:434
+msgid "already sign out"
+msgstr "已经登出"
+
+#: account/views.py:441
+msgid "sign out successfully"
+msgstr "登出成功"
+
+#: account/views.py:445
+msgid "fail to sign out"
+msgstr "登出失败"
+
+#: account/views.py:484
+msgid "verify password successfully"
+msgstr "密码验证成功"
+
+#: account/views.py:488
+msgid "wrong password"
+msgstr "错误的密码"
+
+#: account/views.py:544
+msgid "change password successfully"
+msgstr "密码更新成功"
+
+#: account/views.py:608
+msgid "update email successfully"
+msgstr "邮箱更新成功"
+
+#: account/views.py:686
+msgid "avatar file is required"
+msgstr "请传入头像文件"
+
+#: account/views.py:702
+msgid "change avatar successfully"
+msgstr "头像更新成功"
+
+#: account/views.py:788 account/views.py:847
+msgid "email and password is required"
+msgstr "请传入邮箱和密码"
+
+#: account/views.py:800 account/views.py:858
+msgid "account type converted to official successfully"
+msgstr "转换为正式用户成功"
+
+#: account/views.py:805
+msgid "you are not a trial account"
+msgstr "您不是免登录试用账户"
+
+#: account/views.py:863
+msgid "you are not a google account"
+msgstr "您不是谷歌账户"
+
+#: account/views.py:915
+msgid "no settings record found"
+msgstr "没找到设置记录"
+
+#: note/views.py:168
+msgid "Note not found"
+msgstr "没找到笔记"
+
+#: note/views.py:170
+msgid "you are not allowed to operate this note"
+msgstr "您没有操作这条笔记的权限"

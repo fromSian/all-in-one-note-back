@@ -46,9 +46,9 @@ class UserManager(BaseUserManager):
         other_fields.setdefault("is_active", True)
 
         if other_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must be assigned to is_staff=True")
+            raise ValueError(_("Superuser must be assigned to is_staff=True"))
         elif other_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must be assigned to is_superuser=True")
+            raise ValueError(_("Superuser must be assigned to is_superuser=True"))
 
         return self.create_user(email, password, **other_fields)
 
@@ -95,8 +95,8 @@ class Settings(models.Model):
     LANGUAGE_CHOICES = (
         ("", "none"),
         ("en", "English"),
-        ("zh-cn", "simplified Chinese"),
-        ("zh-tw", "traditional Chinese"),
+        ("zh-CN", "simplified Chinese"),
+        ("zh-TW", "traditional Chinese"),
     )
     language = models.CharField(default="", choices=LANGUAGE_CHOICES)
 

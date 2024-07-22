@@ -56,19 +56,9 @@ single_views = [
         "name": "avatar",
     },
     {
-        "route": "bio/",
-        "view": views.bio,
-        "name": "bio",
-    },
-    {
         "route": "info/",
         "view": views.info,
         "name": "info",
-    },
-    {
-        "route": "upload-avatar/",
-        "view": views.upload_avatar,
-        "name": "upload_avatar",
     },
     {
         "route": "trial/",

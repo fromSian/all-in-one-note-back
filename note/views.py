@@ -22,7 +22,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.renderers import JSONRenderer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
 # Create your views here.
@@ -103,15 +103,6 @@ class NoteItemFilterBackend(DjangoFilterBackend):
             return NoteItemFilter
         return super().get_filterset_class(view, queryset)
 
-    # def get_filterset_kwargs(self, request, queryset, view):
-    #     kwargs = super().get_filterset_kwargs(request, queryset, view)
-
-    #     # merge filterset kwargs provided by view class
-    #     if hasattr(view, "get_filterset_kwargs"):
-    #         kwargs.update(view.get_filterset_kwargs())
-
-    #     return kwargs
-
 
 class NoteItemViewSet(
     SinceIdPageListMixin,
@@ -133,19 +124,6 @@ class NoteItemViewSet(
     def get_queryset(self):
         user = self.request.user
         return NoteItem.objects.filter(note__user=user)
-
-    """
-    create one note_item to a note
-    the sort is added
-    """
-
-    """
-    update one note item
-    """
-
-    """
-    delete a note item
-    """
 
 
 from markdownify import markdownify as md
@@ -187,9 +165,9 @@ def note_content_md(request):
         timezone = request.data.get("timezone", "Asia/Shanghai")
         note = Note.objects.filter(id=id).first()
         if not note:
-            raise ValidationError("Note not found")
+            raise ValidationError(_("Note not found"))
         if note.user != user:
-            raise ValidationError("Permission denied")
+            raise ValidationError(_("you are not allowed to operate this note"))
 
         encryption = AESEncryption()
         order = request.data.get("order", "-created")

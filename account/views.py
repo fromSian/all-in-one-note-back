@@ -90,7 +90,7 @@ def register(request):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                data={"message": "registered"},
+                data={"message": _("sign up successfully")},
                 status=status.HTTP_201_CREATED,
             )
         else:
@@ -173,13 +173,17 @@ def send_code(request):
         email_validator(email)
         if register and check_email_exist(email):
             return Response(
-                {"message": "email already registered"},
+                {
+                    "message": _(
+                        "This email already signed up, please sign in or check your email"
+                    )
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         code = random_word(6)
         cache.set(email + "code", code, timeout=3600)  # 1 hour
         flag = send_mail(
-            subject="email validation - notes & todos 😺",
+            subject=_("email validation - be markdown notes") + " 😺",
             message="",
             html_message="""
             Hi, it is be-notes. glad to have you signed up.
@@ -196,14 +200,16 @@ def send_code(request):
         if flag:
             return Response(
                 {
-                    "message": "send verification code to email success",
+                    "message": _("send verification code to email successfully"),
                 },
                 status=status.HTTP_200_OK,
             )
         else:
             return Response(
                 {
-                    "message": "send email failed, please check the email address and try again."
+                    "message": _(
+                        "send email failed, please check the email address and try again."
+                    )
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -253,12 +259,12 @@ def verify_code(request):
         if code == enter_code:
             cache.delete(email + "code")
             return Response(
-                {"message": "code is correct"},
+                {"message": _("code verifies successfully")},
                 status=status.HTTP_200_OK,
             )
         else:
             return Response(
-                {"message": "code is incorrect"},
+                {"message": _("code is incorrect")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except ValidationError as e:
@@ -298,7 +304,7 @@ def trial(request):
             setting_serializer = SettingsSerializer(setting)
             return Response(
                 {
-                    "message": "trial success",
+                    "message": _("trial successfully"),
                     "token": access_token,
                     **serializer.data,
                     **setting_serializer.data,
@@ -365,16 +371,16 @@ def login(request):
         user = authenticate(username=user_data.get("email", ""), password=password)
         print(user)
         if not user:
-            raise ValidationError("Invalid username or password")
+            raise ValidationError(_("Invalid email or password"))
 
         if not user.groups.values("name").filter(name="front").exists():
-            raise ValidationError("not accessible for this login")
+            raise ValidationError(_("not accessible for front signin"))
 
         if user.type == "google":
-            raise ValidationError("please use the sign in with google")
+            raise ValidationError(_("please use the sign in with google"))
 
         if user.type == "trial":
-            raise ValidationError("sorry, you are not allowed to login")
+            raise ValidationError(_("sorry, this trial account has destroyed"))
         serializer = UserSerializer(user)
         setting = Settings.objects.filter(user=user).first()
         if not setting:
@@ -387,7 +393,7 @@ def login(request):
 
         return Response(
             {
-                "message": "log in successfully",
+                "message": _("sign in successfully"),
                 **serializer_data,
                 **setting_serializer.data,
             },
@@ -424,17 +430,19 @@ def logout(request):
     try:
         user = request.user
         if not user or not user.is_authenticated:
-            return Response({"message": "not login"}, status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": _("already sign out")}, status.HTTP_400_BAD_REQUEST
+            )
 
         isDeleted = logout_logic(user.email)
 
         if isDeleted:
             return Response(
-                {"message": "logout success"},
+                {"message": _("sign out successfully")},
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
-            raise Exception("log out failed")
+            raise Exception(_("fail to sign out"))
     except Exception as e:
         return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -473,11 +481,11 @@ class PasswordView(APIView):
             is_pass = user.check_password(password)
             if is_pass:
                 return Response(
-                    {"message": "Password verified"},
+                    {"message": _("verify password successfully")},
                     status=status.HTTP_200_OK,
                 )
             else:
-                raise ValidationError("Invalid password")
+                raise ValidationError(_("wrong password"))
         except ValidationError as e:
             print(e)
             return Response(
@@ -533,7 +541,7 @@ class PasswordView(APIView):
             password_changed(password, user=user)
             logout_logic(user.email)
             return Response(
-                {"message": "password changed"},
+                {"message": _("change password successfully")},
                 status=status.HTTP_202_ACCEPTED,
             )
         except ValidationError as e:
@@ -597,7 +605,7 @@ def email(request):
             serializer.save()
             logout_logic(email_bak)
             return Response(
-                {"message": "email updated successfully"},
+                {"message": _("update email successfully")},
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
@@ -675,7 +683,7 @@ def avatar(request):
     try:
         avatar_file = request.data.get("file", None)
         if avatar_file is None:
-            raise ValidationError("avatar file is required")
+            raise ValidationError(_("avatar file is required"))
         user = request.user
         # if user.type == "trial":
         #     raise ValidationError("trial user can't change avatar")
@@ -691,57 +699,9 @@ def avatar(request):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {"message": "avatar changed", **serializer.data},
+                {"message": _("change avatar successfully"), **serializer.data},
                 status=status.HTTP_202_ACCEPTED,
             )
-        else:
-            return Response(
-                {"message": serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-    except ValidationError as e:
-        print(e)
-        return Response(
-            {"message": e.message},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-    except Exception as e:
-        return Response(
-            {"message": str(e)},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-"""
-change bio
-"""
-
-
-@swagger_auto_schema(
-    method="PUT",
-    operation_description="change bio",
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=["bio"],
-        properties={
-            "bio": openapi.Schema(type=openapi.TYPE_STRING, description="bio"),
-        },
-    ),
-    responses={
-        status.HTTP_202_ACCEPTED: "success",
-        status.HTTP_400_BAD_REQUEST: "fail",
-    },
-)
-@api_view(["PUT"])
-@permission_classes([RequestValidPermission, permissions.IsAuthenticated])
-def bio(request):
-    try:
-        bio = request.data.get("bio", "")
-        user = request.user
-        serializer = UserSerializer(instance=user, data={"bio": bio}, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "bio changed"}, status=status.HTTP_202_ACCEPTED)
         else:
             return Response(
                 {"message": serializer.errors},
@@ -792,62 +752,6 @@ def info(request):
 
 
 """
-upload avatar image file view
-return image_url
-"""
-
-
-@swagger_auto_schema(
-    method="POST",
-    operation_description="upload avatar file",
-    manual_parameters=[
-        openapi.Parameter(
-            name="file",
-            in_=openapi.IN_FORM,
-            type=openapi.TYPE_FILE,
-            required=True,
-            description="avatar file",
-        )
-    ],
-    responses={
-        status.HTTP_202_ACCEPTED: "success",
-        status.HTTP_400_BAD_REQUEST: "fail",
-    },
-)
-@api_view(["POST"])
-@parser_classes([parsers.MultiPartParser])
-def upload_avatar(request):
-    try:
-        file = request.data.get("file", None)
-        if file is None:
-            raise ValidationError("avatar file is required")
-        serialzer = ImageFileSerializer(data={"file": file})
-        if serialzer.is_valid():
-            loaded_file = serialzer.validated_data.get("file")
-            path = handle_uploaded_file(loaded_file, loaded_file.name)
-            return Response(
-                {"url": request.build_absolute_uri(path)},
-                status=status.HTTP_202_ACCEPTED,
-            )
-        else:
-            return Response(
-                {"message": serialzer.errors},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-    except ValidationError as e:
-        print(e)
-        return Response(
-            {"message": e.message},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-    except Exception as e:
-        return Response(
-            {"message": str(e)},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-"""
 convert account type to base
 """
 
@@ -881,7 +785,7 @@ def trial_to_base(request):
         email_validator(email)
         if not email or not password:
             return Response(
-                {"message": "email and password is required"},
+                {"message": _("email and password is required")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if user.type == "trial":
@@ -893,12 +797,12 @@ def trial_to_base(request):
             logout_logic(user.email)
             user.save()
             return Response(
-                {"message": "account type converted to base"},
+                {"message": _("account type converted to official successfully")},
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
             return Response(
-                {"message": "you are not a trial user"},
+                {"message": _("you are not a trial account")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except ValidationError as e:
@@ -940,7 +844,7 @@ def google_to_base(request):
         password = rsa_encryption.decrypt(_password)
         if not password:
             return Response(
-                {"message": "email and password is required"},
+                {"message": _("email and password is required")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if user.type == "google":
@@ -951,12 +855,12 @@ def google_to_base(request):
             logout_logic(user.email)
             user.save()
             return Response(
-                {"message": "account type converted to base"},
+                {"message": _("account type converted to official successfully")},
                 status=status.HTTP_202_ACCEPTED,
             )
         else:
             return Response(
-                {"message": "you are not a google user"},
+                {"message": _("you are not a google account")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except ValidationError as e:
@@ -974,39 +878,6 @@ def google_to_base(request):
 
 class SettingView(APIView):
     permission_classes = [RequestValidPermission, permissions.IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_description="get settings",
-        responses={
-            status.HTTP_200_OK: SettingsSerializer,
-            status.HTTP_400_BAD_REQUEST: openapi.Response(
-                "fail", examples={"message": "fail"}
-            ),
-        },
-    )
-    def get(self, request, *args, **kwargs):
-        try:
-            user = request.user
-            settings = Settings.objects.filter(user=user).first()
-            if not settings:
-                raise ValidationError("No settings record found")
-            serializer = SettingsSerializer(settings)
-            return Response(
-                serializer.data,
-                status=status.HTTP_202_ACCEPTED,
-            )
-        except ValidationError as e:
-            print(e)
-            return Response(
-                {"message": e.message},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception as e:
-            print(e)
-            return Response(
-                {"message": str(e)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
     @swagger_auto_schema(
         operation_description="update settings",
@@ -1041,7 +912,7 @@ class SettingView(APIView):
             user = request.user
             settings = Settings.objects.filter(user=user).first()
             if not settings:
-                raise ValidationError("No settings record found")
+                raise ValidationError(_("no settings record found"))
             serializer = SettingsSerializer(settings, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
