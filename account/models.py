@@ -113,3 +113,40 @@ class Settings(models.Model):
 def create_settings(sender, instance, created, **kwargs):
     if created:
         setting = Settings.objects.create(user=instance)
+
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+"""
+每天刪除trial用戶
+"""
+
+from datetime import datetime, timedelta, timezone
+from django.utils import timezone
+
+
+def delete_trial():
+    expired = timezone.now() - timedelta(hours=2)
+    User.objects.filter(type="trial").filter(date_joined__lt=expired).delete()
+    print(123)
+
+
+"""
+定时任务
+"""
+scheduler = BackgroundScheduler()
+try:
+    scheduler.add_job(
+        delete_trial,
+        "cron",
+        hour=23,
+        minute=59,
+        second=59,
+        id="delete_trial",
+        replace_existing=True,
+        timezone="UTC",
+    )
+    scheduler.start()
+except Exception as e:
+    print(e)
+    scheduler.shutdown()

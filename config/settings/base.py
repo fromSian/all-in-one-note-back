@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "rest_framework_simplejwt",
     "drf_api_logger",
+    "django_apscheduler",
     # local application
     "account",
     "note",
