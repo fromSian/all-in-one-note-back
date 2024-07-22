@@ -21,7 +21,7 @@ class UserSerializer(EncryptSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["email", "password", "image", "type", "id"]
-        encryption_class = RSAEncryption
+        # encryption_class = RSAEncryption
         # encrypt_fields = ("password",)
         # read_only_fields = ("type",)
         # write_only_fields = ("password",)

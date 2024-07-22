@@ -35,10 +35,13 @@ from datetime import timedelta
 
 from utils.file import handle_uploaded_file, crop
 from utils.string import random_word
+from utils.encryption import RSAEncryption
 from uuid import uuid4
+from utils.permission import RequestValidPermission
 
 # Create your views here.
 
+rsa_encryption = RSAEncryption()
 
 """
 register
@@ -81,7 +84,7 @@ def register(request):
     try:
         data = request.data
         data["type"] = "base"
-
+        data["password"] = rsa_encryption.decrypt(data["password"])
         serializer = UserSerializer(data=data)
 
         if serializer.is_valid():
@@ -358,7 +361,9 @@ log in
 def login(request):
     try:
         user_data = request.data
-        user = authenticate(username=user_data["email"], password=user_data["password"])
+        password = rsa_encryption.decrypt(user_data.get("password", ""))
+        user = authenticate(username=user_data.get("email", ""), password=password)
+        print(user)
         if not user:
             raise ValidationError("Invalid username or password")
 
@@ -418,7 +423,7 @@ def logout_logic(key):
 def logout(request):
     try:
         user = request.user
-        if not user:
+        if not user or not user.is_authenticated:
             return Response({"message": "not login"}, status.HTTP_400_BAD_REQUEST)
 
         isDeleted = logout_logic(user.email)
@@ -463,6 +468,7 @@ class PasswordView(APIView):
         """
         try:
             password = request.data.get("password")
+            password = rsa_encryption.decrypt(password)
             user = request.user
             is_pass = user.check_password(password)
             if is_pass:
@@ -519,7 +525,8 @@ class PasswordView(APIView):
         if success log out
         """
         try:
-            password = request.data.get("password")
+            _password = request.data.get("password")
+            password = rsa_encryption.decrypt(_password)
             user = request.user
             user.set_password(password)
             user.save()
@@ -868,7 +875,8 @@ convert account type to base
 def trial_to_base(request):
     try:
         user = request.user
-        password = request.data.get("password", "")
+        _password = request.data.get("password", "")
+        password = rsa_encryption.decrypt(_password)
         email = request.data.get("email", "")
         email_validator(email)
         if not email or not password:
@@ -928,7 +936,8 @@ def trial_to_base(request):
 def google_to_base(request):
     try:
         user = request.user
-        password = request.data.get("password", "")
+        _password = request.data.get("password", "")
+        password = rsa_encryption.decrypt(_password)
         if not password:
             return Response(
                 {"message": "email and password is required"},
@@ -1057,9 +1066,6 @@ class SettingView(APIView):
                 {"message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-
-from utils.permission import RequestValidPermission
 
 
 class TestViewSet(viewsets.ModelViewSet):
