@@ -82,9 +82,12 @@ password: using ras encryption
 @api_view(["POST"])
 def register(request):
     try:
-        data = request.data
-        data["type"] = "base"
-        data["password"] = rsa_encryption.decrypt(data["password"])
+        data = {
+            "email": request.data.get("email"),
+            "password": rsa_encryption.decrypt(request.data.get("password")),
+            "type": "base",
+        }
+        print(data["password"])
         serializer = UserSerializer(data=data)
 
         if serializer.is_valid():
@@ -95,7 +98,7 @@ def register(request):
             )
         else:
             return Response(
-                data={"message": serializer.error_messages},
+                data={"message": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except ValidationError as e:
@@ -180,15 +183,14 @@ def send_code(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        prev = cache.keys(email + "_*")
-        if len(prev) > 0 and cache.ttl(prev[0]) > 59 * 60:
+        prev = cache.get(email + "code")
+        if prev and cache.ttl(prev) > 59 * 60:
             return Response(
                 {"message": _("send too often, please try again after one minute")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        cache.delete_pattern(email + "_*")
         code = random_word(6)
-        cache.set(email + "_code", code, timeout=3600)  # 1 hour
+        cache.set(email + "code", code, timeout=3600)  # 1 hour
         flag = send_mail(
             subject=_("email validation - be markdown notes") + " 😺",
             message="",
@@ -950,3 +952,31 @@ class TestViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [RequestValidPermission]
+
+
+@swagger_auto_schema(
+    method="DELETE",
+    operation_description="delete user",
+)
+@permission_classes([RequestValidPermission, permissions.IsAuthenticated])
+@api_view(["DELETE"])
+def delete_user(request):
+    try:
+        user = request.user
+        user.delete()
+        return Response(
+            {"message": _("user deleted successfully")},
+            status=status.HTTP_202_ACCEPTED,
+        )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        print(e)
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

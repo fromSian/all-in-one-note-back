@@ -31,7 +31,7 @@ class RSAEncryption:
         cipher = PKCS1_v1_5.new(private_key)
         decrypted_text = cipher.decrypt(b64decode(text), get_random_bytes(32))
         # decrypted_text = cipher.decrypt(text)
-        return decrypted_text
+        return decrypted_text.decode("utf-8")
 
     def _get_public_key(self):
         pub = os.environ.get("PUBLIC_KEY")

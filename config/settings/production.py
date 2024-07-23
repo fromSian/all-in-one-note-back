@@ -1,13 +1,14 @@
 from .base import *
+import os
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis-17938.c56.east-us.azure.redns.redis-cloud.com:17938",
+        "LOCATION": "redis://default:SsQIbNcE0hyl4porRqu6TRCGjaQ7Kl9s@redis-16325.c12.us-east-1-4.ec2.redns.redis-cloud.com:16325",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "DB": "cache-LX0NU332",
-            "PASSWORD": "MsKFFHE4r8Yiu0C7ldOi6JV7AAcBLUUs",
+            "DB": "cache-LYYW0G8F",
+            "PASSWORD": os.environ.get("REDIS_PWD"),
         },
     }
 }
@@ -20,8 +21,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "postgres",
-        "USER": "postgres.xesbgjafrslmhbctfhnl",
-        "PASSWORD": "SotoNote0530001",
+        "USER": "postgres.hrcpfvwjbsrmgoaivjff",
+        "PASSWORD": os.environ.get("PGSQL_PWD"),
         "HOST": "aws-0-ap-southeast-1.pooler.supabase.com",
         "PORT": "6543",
     }

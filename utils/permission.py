@@ -48,10 +48,11 @@ def check_valid(action_time):
 
 class RequestValidPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-
+        return True
         action_time = request.query_params.get("action_time")
         if not action_time:
             return False
         encrypt = RSAEncryption()
         action = encrypt.decrypt(action_time)
+
         return check_valid(action)

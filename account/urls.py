@@ -80,6 +80,11 @@ single_views = [
         "view": views.SettingView.as_view(),
         "name": "settings",
     },
+    {
+        "route": "delete/",
+        "view": views.delete_user,
+        "name": "delete",
+    },
 ]
 
 router = RouterWithSingleView(single_views=single_views)
