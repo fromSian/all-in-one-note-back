@@ -128,7 +128,6 @@ from django.utils import timezone
 def delete_trial():
     expired = timezone.now() - timedelta(hours=2)
     User.objects.filter(type="trial").filter(date_joined__lt=expired).delete()
-    print(123)
 
 
 """

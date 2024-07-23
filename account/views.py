@@ -180,8 +180,15 @@ def send_code(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        prev = cache.keys(email + "_*")
+        if len(prev) > 0 and cache.ttl(prev[0]) > 59 * 60:
+            return Response(
+                {"message": _("send too often, please try again after one minute")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        cache.delete_pattern(email + "_*")
         code = random_word(6)
-        cache.set(email + "code", code, timeout=3600)  # 1 hour
+        cache.set(email + "_code", code, timeout=3600)  # 1 hour
         flag = send_mail(
             subject=_("email validation - be markdown notes") + " 😺",
             message="",

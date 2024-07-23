@@ -169,3 +169,7 @@ msgstr "没找到笔记"
 #: note/views.py:170
 msgid "you are not allowed to operate this note"
 msgstr "您没有操作这条笔记的权限"
+
+
+msgid "send too often, please try again after one minute"
+msgstr "验证码发送频繁，请一分钟后尝试"

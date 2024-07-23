@@ -728,3 +728,7 @@ msgstr "沒找到筆記"
 #: note/views.py:170
 msgid "you are not allowed to operate this note"
 msgstr "您沒有操作這條筆記的權限"
+
+
+msgid "send too often, please try again after one minute"
+msgstr "驗證碼發送頻繁，請一分鐘後嘗試"

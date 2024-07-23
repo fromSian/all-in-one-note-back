@@ -63,6 +63,9 @@ msgstr ""
 msgid "This email already signed up, please sign in or check your email"
 msgstr ""
 
+msgid "send too often, please try again after one minute"
+msgstr ""
+
 #: account/views.py:186
 msgid "email validation - be markdown notes"
 msgstr ""
