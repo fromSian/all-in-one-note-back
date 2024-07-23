@@ -1,9 +1,8 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }],
   "version": 2,
   "builds": [
     {
-      "src": "<projectname>/wsgi.py",
+      "src": "be-markdown-notes-api/wsgi.py",
       "use": "@vercel/python",
       "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
     },
@@ -13,6 +12,16 @@
       "config": {
         "distDir": "staticfiles"
       }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "be-markdown-notes-api/wsgi.py"
     }
   ]
 }
