@@ -1,5 +1,7 @@
+APScheduler==3.10.4
 asgiref==3.8.1
 attrs==23.2.0
+beautifulsoup4==4.12.3
 bleach==6.1.0
 certifi==2024.2.2
 cffi==1.16.0
@@ -8,6 +10,8 @@ crypto==1.4.1
 cryptography==42.0.7
 defusedxml==0.8.0rc2
 Django==5.0.6
+django-apscheduler==0.6.2
+django-cors-headers==4.4.0
 django-filter==24.2
 django-redis==5.4.0
 django-templated-mail==1.1.1
@@ -17,6 +21,7 @@ drf-yasg==1.21.7
 drf_api_logger==1.1.15
 idna==3.7
 inflection==0.5.1
+markdownify==0.12.1
 Naked==0.1.32
 oauthlib==3.2.2
 packaging==24.0
@@ -38,7 +43,9 @@ shellescape==3.8.1
 six==1.16.0
 social-auth-app-django==5.4.1
 social-auth-core==4.5.4
+soupsieve==2.5
 sqlparse==0.5.0
+tzlocal==5.2
 uritemplate==4.1.1
 urllib3==2.2.1
 webencodings==0.5.1
