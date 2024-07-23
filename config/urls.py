@@ -39,14 +39,12 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path(
-        "swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-redoc"
-    ),
+    path("", schema_view.with_ui("swagger", cache_timeout=0), name="schema-redoc"),
     path("account/", include("account.urls")),
     path("note/", include("note.urls")),
 ]
 
-'''
+"""
 google oauth access
 
 /account/google/access
@@ -54,7 +52,7 @@ google oauth access
 google oauth callback
 
 /account/google/callback
-'''
+"""
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
