@@ -30,8 +30,7 @@ SECRET_KEY = "django-insecure-qp&ju@xco_^8a6(a0x_3ah^d%ab3l@7eohz%86^-@@prckjte9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [".vercel.app", ".now.sh"]
 
 # Application definition
 
@@ -202,3 +201,9 @@ GOOGLE_OAUTH2_CLIENT_SECRET = "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"
 GOOGLE_OAUTH2_PROJECT_ID = "nextjsfollow"
 
 BASE_BACKEND_URL = "http://localhost:8000/"
+
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"
