@@ -26,7 +26,7 @@ Naked==0.1.32
 oauthlib==3.2.2
 packaging==24.0
 pillow==10.3.0
-psycopg2-binary==2.9.3
+psycopg2-binary==2.9.9
 pyasn1==0.6.0
 pycparser==2.22
 pycryptodome==3.20.0
