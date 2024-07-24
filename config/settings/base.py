@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-
+import os
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
@@ -200,8 +200,5 @@ GOOGLE_OAUTH2_PROJECT_ID = "nextjsfollow"
 
 BASE_BACKEND_URL = "http://localhost:8000/"
 
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")

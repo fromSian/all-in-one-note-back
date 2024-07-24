@@ -2,15 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "be-markdown-notes-api/wsgi.py",
+      "src": "all-in-one-note-back/wsgi.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
     },
     {
       "src": "build_files.sh",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "staticfiles"
+        "distDir": "staticfiles_build"
       }
     }
   ],
@@ -21,7 +21,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "be-markdown-notes-api/wsgi.py"
+      "dest": "all-in-one-note-back/wsgi.py"
     }
   ]
 }
