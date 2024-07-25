@@ -69,7 +69,9 @@ class User(AbstractUser):
         ("google", "from_google"),
         ("trial", "from_trial"),
     )
-    type = models.CharField("type", choices=TYPE_CHOICES, blank=False, default="base")
+    type = models.CharField(
+        "type", choices=TYPE_CHOICES, blank=False, default="base", max_length=255
+    )
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
@@ -90,7 +92,9 @@ class Settings(models.Model):
         ("-created", "created descending"),
     )
 
-    sortInfo = models.CharField(default="-updated", choices=SORT_CHOICES)
+    sortInfo = models.CharField(
+        default="-updated", choices=SORT_CHOICES, max_length=255
+    )
 
     LANGUAGE_CHOICES = (
         ("", "none"),
@@ -98,7 +102,7 @@ class Settings(models.Model):
         ("zh-CN", "simplified Chinese"),
         ("zh-TW", "traditional Chinese"),
     )
-    language = models.CharField(default="", choices=LANGUAGE_CHOICES)
+    language = models.CharField(default="", choices=LANGUAGE_CHOICES, max_length=255)
 
     THEME_CHOICES = (
         ("", "none"),
@@ -106,7 +110,7 @@ class Settings(models.Model):
         ("light", "light"),
         ("system", "system"),
     )
-    theme = models.CharField(default="", choices=THEME_CHOICES)
+    theme = models.CharField(default="", choices=THEME_CHOICES, max_length=255)
 
 
 @receiver(post_save, sender=User)

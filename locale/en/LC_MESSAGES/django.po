@@ -173,3 +173,14 @@ msgstr ""
 #: note/views.py:170
 msgid "you are not allowed to operate this note"
 msgstr ""
+
+
+msgid "account not found"
+msgstr ""
+
+
+msgid "This email does not exist, please register first"
+msgstr ""
+
+msgid "user deleted successfully"
+msgstr ""

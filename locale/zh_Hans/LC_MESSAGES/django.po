@@ -173,3 +173,13 @@ msgstr "您没有操作这条笔记的权限"
 
 msgid "send too often, please try again after one minute"
 msgstr "验证码发送频繁，请一分钟后尝试"
+
+msgid "account not found"
+msgstr "未找到账户"
+
+msgid "This email does not exist, please register first"
+msgstr "此邮箱尚未注册，请先注册"
+
+
+msgid "user deleted successfully"
+msgstr "账户注销成功"

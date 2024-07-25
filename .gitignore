@@ -17,3 +17,5 @@ venv
 .env
 
 /media
+
+*.sqlite3

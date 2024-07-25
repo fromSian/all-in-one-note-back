@@ -183,6 +183,11 @@ def send_code(request):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        if not register and not check_email_exist(email):
+            return Response(
+                {"message": _("This email does not exist, please register first")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         prev = cache.get(email + "code")
         if prev and cache.ttl(prev) > 59 * 60:
             return Response(
@@ -565,6 +570,58 @@ class PasswordView(APIView):
                 {"message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+@swagger_auto_schema(
+    method="POST",
+    operation_description="update password",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=["email", "password"],
+        properties={
+            "email": openapi.Schema(
+                type=openapi.TYPE_STRING, description="email address"
+            ),
+            "password": openapi.Schema(
+                type=openapi.TYPE_STRING, description="password"
+            ),
+        },
+    ),
+    responses={
+        status.HTTP_202_ACCEPTED: "success",
+        status.HTTP_400_BAD_REQUEST: "fail",
+    },
+)
+@api_view(["POST"])
+def update_password(request):
+    try:
+        email = request.data.get("email")
+        _password = request.data.get("password")
+        if not email or not _password:
+            raise ValidationError(_("email and password are required"))
+        password = rsa_encryption.decrypt(_password)
+        user = User.objects.filter(email=email).first()
+        if not user:
+            raise ValidationError(_("account not found"))
+        user.set_password(password)
+        user.save()
+        password_changed(password, user=user)
+        return Response(
+            {"message": _("change password successfully")},
+            status=status.HTTP_202_ACCEPTED,
+        )
+    except ValidationError as e:
+        print(e)
+        return Response(
+            {"message": e.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        print(e)
+        return Response(
+            {"message": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 """
@@ -964,6 +1021,7 @@ def delete_user(request):
     try:
         user = request.user
         user.delete()
+        logout_logic(user.email)
         return Response(
             {"message": _("user deleted successfully")},
             status=status.HTTP_202_ACCEPTED,

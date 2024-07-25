@@ -199,6 +199,3 @@ GOOGLE_OAUTH2_CLIENT_SECRET = "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"
 GOOGLE_OAUTH2_PROJECT_ID = "nextjsfollow"
 
 BASE_BACKEND_URL = "http://localhost:8000/"
-
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")

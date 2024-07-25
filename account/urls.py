@@ -46,6 +46,11 @@ single_views = [
         "name": "password",
     },
     {
+        "route": "passwordnew/",
+        "view": views.update_password,
+        "name": "passwordnew",
+    },
+    {
         "route": "email/",
         "view": views.email,
         "name": "email",
