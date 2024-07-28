@@ -174,7 +174,7 @@ def note_content_md(request):
         order = "-created" if not order else order
         note_items = NoteItem.objects.filter(note__id=id).order_by(order)
         markdown_content = """# {0} \n\n<div style='display: flex; justify-content: end; color: #8da2b8; font-size: 10px'>{1} {2}</div>\n\n""".format(
-            encryption.decrypt(note.title),
+            encryption.decrypt(note.title) if note.title else "",
             localtime(note.created, ZoneInfo(timezone)).strftime(
                 "%Y-%m-%d %H:%M:%S %z"
             ),
@@ -184,7 +184,10 @@ def note_content_md(request):
         )
         for note_item in note_items:
             markdown_content += (
-                md(encryption.decrypt(note_item.content), heading_style="ATX")
+                md(
+                    encryption.decrypt(note_item.content) if note_item.content else "",
+                    heading_style="ATX",
+                )
                 + "<div style='display: flex; justify-content: end; color: #8da2b8; font-size: 10px'>{0} {1}</div>\n\n".format(
                     localtime(note_item.created, ZoneInfo(timezone)).strftime(
                         "%Y-%m-%d %H:%M:%S %z"
@@ -206,6 +209,7 @@ def note_content_md(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as e:
+        print(e)
         return Response(
             {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,

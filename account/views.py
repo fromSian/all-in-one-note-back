@@ -442,13 +442,12 @@ def logout_logic(key):
 @api_view(["POST"])
 def logout(request):
     try:
-        user = request.user
-        if not user or not user.is_authenticated:
-            return Response(
-                {"message": _("already sign out")}, status.HTTP_400_BAD_REQUEST
-            )
-
-        isDeleted = logout_logic(user.email)
+        # if not user or not user.is_authenticated:
+        #     return Response(
+        #         {"message": _("already sign out")}, status.HTTP_400_BAD_REQUEST
+        #     )
+        if request.user and request.user.is_authenticated:
+            isDeleted = logout_logic(request.user.email)
 
         if isDeleted:
             return Response(
@@ -458,6 +457,7 @@ def logout(request):
         else:
             raise Exception(_("fail to sign out"))
     except Exception as e:
+        print(e)
         return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -1020,8 +1020,8 @@ class TestViewSet(viewsets.ModelViewSet):
 def delete_user(request):
     try:
         user = request.user
-        user.delete()
         logout_logic(user.email)
+        user.delete()
         return Response(
             {"message": _("user deleted successfully")},
             status=status.HTTP_202_ACCEPTED,
