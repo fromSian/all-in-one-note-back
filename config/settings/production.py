@@ -3,7 +3,11 @@ import os
 
 DEBUG = False
 
-ALLOWED_HOSTS = [".vercel.app", ".now.sh"]
+ALLOWED_HOSTS = [
+    "fromsian.pythonanywhere.com",
+    ".vercel.app",
+    ".now.sh",
+]
 
 CACHES = {
     "default": {
