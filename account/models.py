@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from utils.file import get_size, image_content_types
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
 
 # Create your models here.
 
@@ -119,37 +120,37 @@ def create_settings(sender, instance, created, **kwargs):
         setting = Settings.objects.create(user=instance)
 
 
-from apscheduler.schedulers.background import BackgroundScheduler
+if settings.DEBUG:
 
-"""
-每天刪除trial用戶
-"""
+    from apscheduler.schedulers.background import BackgroundScheduler
 
-from datetime import datetime, timedelta, timezone
-from django.utils import timezone
+    """
+    每天刪除trial用戶
+    """
 
+    from datetime import datetime, timedelta, timezone
+    from django.utils import timezone
 
-def delete_trial():
-    expired = timezone.now() - timedelta(hours=2)
-    User.objects.filter(type="trial").filter(date_joined__lt=expired).delete()
+    def delete_trial():
+        expired = timezone.now() - timedelta(hours=2)
+        User.objects.filter(type="trial").filter(date_joined__lt=expired).delete()
 
-
-"""
-定时任务
-"""
-scheduler = BackgroundScheduler()
-try:
-    scheduler.add_job(
-        delete_trial,
-        "cron",
-        hour=23,
-        minute=59,
-        second=59,
-        id="delete_trial",
-        replace_existing=True,
-        timezone="UTC",
-    )
-    scheduler.start()
-except Exception as e:
-    print(e)
-    scheduler.shutdown()
+    """
+    定时任务
+    """
+    scheduler = BackgroundScheduler()
+    try:
+        scheduler.add_job(
+            delete_trial,
+            "cron",
+            hour=23,
+            minute=59,
+            second=59,
+            id="delete_trial",
+            replace_existing=True,
+            timezone="UTC",
+        )
+        scheduler.start()
+    except Exception as e:
+        print(e)
+        scheduler.shutdown()
