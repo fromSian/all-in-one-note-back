@@ -1038,3 +1038,26 @@ def delete_user(request):
             {"message": str(e)},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+from datetime import datetime, timedelta, timezone
+from django.utils import timezone
+
+
+def delete_trial():
+    expired = timezone.now() - timedelta(hours=2)
+    User.objects.filter(type="trial").filter(date_joined__lt=expired).delete()
+
+
+@permission_classes([permissions.AllowAny])
+@api_view(["POST"])
+def clean_trial(request):
+    try:
+        delete_trial()
+        return Response(
+            {"message": _("trial account deleted successfully")},
+            status=status.HTTP_202_ACCEPTED,
+        )
+    except Exception as e:
+        print(e)
+        return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

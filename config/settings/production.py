@@ -42,3 +42,7 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+
+GOOGLE_OAUTH2_REDIRECT_SUCCESS_URL = "http://localhost:5173/google/success/"
+GOOGLE_OAUTH2_REDIRECT_FAIL_URL = "http://localhost:5173/error/google/fail/"

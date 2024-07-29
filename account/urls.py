@@ -90,6 +90,11 @@ single_views = [
         "view": views.delete_user,
         "name": "delete",
     },
+    {
+        "route": "clean_trial/",
+        "view": views.clean_trial,
+        "name": "clean_trial",
+    },
 ]
 
 router = RouterWithSingleView(single_views=single_views)
