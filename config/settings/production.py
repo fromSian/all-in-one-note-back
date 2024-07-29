@@ -4,6 +4,7 @@ import os
 DEBUG = False
 
 ALLOWED_HOSTS = [
+    "localhost:5173",
     "fromsian.pythonanywhere.com",
     ".vercel.app",
     ".now.sh",
