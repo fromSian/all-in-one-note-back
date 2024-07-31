@@ -14,11 +14,8 @@ class RSAEncryption:
     PRIVATE_KEY = None
 
     def __init__(self) -> None:
-        if self.PRIVATE_KEY is None:
-            self.PRIVATE_KEY = self._get_private_key()
-
-        if self.PUBLIC_KEY is None:
-            self.PUBLIC_KEY = self._get_public_key()
+        self.PRIVATE_KEY = self._get_private_key()
+        self.PUBLIC_KEY = self._get_public_key()
 
     def encrypt(self, text):
         public_key = RSA.importKey(self.PUBLIC_KEY)
