@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # 3rd party libraries
+    "corsheaders",
     "rest_framework",
     "django_filters",
     "drf_yasg",
@@ -61,6 +62,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 DRF_API_LOGGER_DATABASE = True
 
@@ -180,11 +182,6 @@ EMAIL_HOST_USER = "notetodos@163.com"
 EMAIL_HOST_PASSWORD = "YFBRQNDXULLRFQCV"
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-
 ADMINS = [("notes & todos", "notetodos@163.com")]
 
 
@@ -198,7 +195,6 @@ GOOGLE_OAUTH2_CLIENT_ID = (
 GOOGLE_OAUTH2_CLIENT_SECRET = "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"
 GOOGLE_OAUTH2_PROJECT_ID = "nextjsfollow"
 
-BASE_BACKEND_URL = "http://localhost:8000/"
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")

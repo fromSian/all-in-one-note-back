@@ -36,3 +36,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+
+BASE_BACKEND_URL = "http://localhost:8000/"
