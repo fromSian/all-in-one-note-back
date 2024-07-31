@@ -2,14 +2,11 @@ from .base import *
 import os
 
 DEBUG = False
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://fromsian.pythonanywhere.com",
-    "https://be-markdown-notes.vercel.app",
-]
+
 
 ALLOWED_HOSTS = [
-    "localhost:5173",
+    ".localhost",
+    "127.0.0.1",
     "fromsian.pythonanywhere.com",
     ".vercel.app",
     ".now.sh",
