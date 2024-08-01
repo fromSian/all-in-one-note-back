@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from utils.urls import RouterWithSingleView
 from . import views
 from utils.google import GoogleLoginAccessView, GoogleLoginCallbackView
+from utils.google_third import access_view, callback_view
 
 single_views = [
     {
@@ -11,8 +12,14 @@ single_views = [
         "name": "google-access",
     },
     {
+        "route": "google/test/",
+        "view": access_view,
+        "name": "google-test",
+    },
+    {
         "route": "google/callback/",
-        "view": GoogleLoginCallbackView.as_view(),
+        # "view": GoogleLoginCallbackView.as_view(),
+        "view": callback_view,
         "name": "google-callback",
     },
     {
