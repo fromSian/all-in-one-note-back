@@ -12,7 +12,6 @@ from account.views import login_token_logic
 from account.serializers import UserSerializer
 from account.models import User
 from rest_framework.exceptions import ValidationError
-from attrs import define
 from django.http import HttpResponseRedirect
 from urllib.parse import urlencode
 

@@ -6,15 +6,15 @@ from utils.google import GoogleLoginAccessView, GoogleLoginCallbackView
 from utils.google_third import access_view, callback_view
 
 single_views = [
+    # {
+    #     "route": "google/access/",
+    #     "view": GoogleLoginAccessView.as_view(),
+    #     "name": "google-access",
+    # },
     {
         "route": "google/access/",
-        "view": GoogleLoginAccessView.as_view(),
-        "name": "google-access",
-    },
-    {
-        "route": "google/test/",
         "view": access_view,
-        "name": "google-test",
+        "name": "google-access",
     },
     {
         "route": "google/callback/",
