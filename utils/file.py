@@ -45,7 +45,9 @@ def crop(file, crop_tuple):
     file_name = uuid.uuid4().hex
     file_extension = os.path.splitext(file.name)[1]
     file_path = os.path.join(settings.MEDIA_URL, file_name + file_extension)
+    if not os.path.isdir(settings.MEDIA_ROOT):
+        os.mkdir(settings.MEDIA_ROOT)
     with Image.open(file) as im:
         im_crop = im.crop(crop_tuple)
-        im_crop.save("media/" + file_name + file_extension)
+        im_crop.save(os.path.join(settings.MEDIA_ROOT, file_name + file_extension))
         return file_path

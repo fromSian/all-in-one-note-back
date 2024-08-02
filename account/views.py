@@ -452,6 +452,7 @@ def logout(request):
         #     return Response(
         #         {"message": _("already sign out")}, status.HTTP_400_BAD_REQUEST
         #     )
+        isDeleted = True
         if request.user and request.user.is_authenticated:
             isDeleted = logout_logic(request.user.email)
 
