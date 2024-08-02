@@ -156,9 +156,9 @@ REST_FRAMEWORK = {
         # "rest_framework_simplejwt.authentication.JWTAuthentication",
         "utils.authentication.RedisJWTAuthentication",
     ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "utils.permission.RequestValidPermission",
-    ],
+    # "DEFAULT_PERMISSION_CLASSES": [
+    #     # "utils.permission.RequestValidPermission",
+    # ],
     "DEFAULT_PAGINATION_CLASS": "utils.pagination.CustomPagination",
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S %Z",
     "EXCEPTION_HANDLER": "utils.exception.custom_exception_handler",

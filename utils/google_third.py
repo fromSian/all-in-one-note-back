@@ -1,9 +1,9 @@
 import google_auth_oauthlib.flow
 from django.shortcuts import redirect
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework import status, serializers
+from rest_framework import status, serializers, permissions
 import requests
 import os
 import jwt
@@ -30,6 +30,7 @@ API_URI = "account/google/callback"
 callback_uri = f"{domain}{API_URI}"
 
 
+@permission_classes([permissions.AllowAny])
 @api_view(["get"])
 def access_view(request):
     try:
@@ -71,6 +72,7 @@ class InputSerializer(serializers.Serializer):
     state = serializers.CharField(required=False)
 
 
+@permission_classes([permissions.AllowAny])
 @api_view(["get"])
 def callback_view(request):
     try:

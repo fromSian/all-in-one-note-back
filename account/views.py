@@ -79,6 +79,7 @@ password: using ras encryption
         ),
     },
 )
+@permission_classes([RequestValidPermission])
 @api_view(["POST"])
 def register(request):
     try:
@@ -168,6 +169,7 @@ def check_email_exist(email):
         ),
     },
 )
+@permission_classes([RequestValidPermission])
 @api_view(["POST"])
 def send_code(request):
     try:
@@ -262,6 +264,7 @@ def send_code(request):
         ),
     },
 )
+@permission_classes([RequestValidPermission])
 @api_view(["POST"])
 def verify_code(request):
     try:
@@ -300,6 +303,7 @@ create trial user
 """
 
 
+@permission_classes([RequestValidPermission])
 @api_view(["POST"])
 def trial(request):
     try:
@@ -377,6 +381,7 @@ log in
         status.HTTP_400_BAD_REQUEST: "fail",
     },
 )
+@permission_classes([RequestValidPermission])
 @api_view(["POST"])
 def login(request):
     try:
@@ -439,6 +444,7 @@ def logout_logic(key):
         status.HTTP_400_BAD_REQUEST: "fail",
     },
 )
+@permission_classes([RequestValidPermission])
 @api_view(["POST"])
 def logout(request):
     try:
@@ -592,6 +598,7 @@ class PasswordView(APIView):
         status.HTTP_400_BAD_REQUEST: "fail",
     },
 )
+@permission_classes([RequestValidPermission])
 @api_view(["POST"])
 def update_password(request):
     try:
@@ -659,6 +666,7 @@ if success log out
         status.HTTP_400_BAD_REQUEST: "fail",
     },
 )
+@permission_classes([RequestValidPermission])
 @api_view(["PUT"])
 def email(request):
     try:
