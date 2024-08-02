@@ -16,7 +16,7 @@ from django.http import HttpResponseRedirect
 from urllib.parse import urlencode
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-CLIENT_SECRETS_FILE = "client_secret.json"
+CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, "client_secret.json")
 
 SCOPES = [
     "openid",
