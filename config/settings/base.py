@@ -187,7 +187,7 @@ EMAIL_HOST = "smtp.163.com"
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
 EMAIL_HOST_USER = "notetodos@163.com"
-EMAIL_HOST_PASSWORD = "YFBRQNDXULLRFQCV"
+EMAIL_HOST_PASSWORD = os.environ.get("SMTP_PWD")
 
 
 ADMINS = [("notes & todos", "notetodos@163.com")]
@@ -197,10 +197,8 @@ ADMINS = [("notes & todos", "notetodos@163.com")]
 google oauth2
 """
 
-GOOGLE_OAUTH2_CLIENT_ID = (
-    "973500819258-0etd8ouhtgq904uo8p712sr3q0krtdk2.apps.googleusercontent.com"
-)
-GOOGLE_OAUTH2_CLIENT_SECRET = "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"
+GOOGLE_OAUTH2_CLIENT_ID = os.environ.get("GOOGLE_OAUTH2_CLIENT_ID")
+GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH2_CLIENT_SECRET")
 GOOGLE_OAUTH2_PROJECT_ID = "nextjsfollow"
 
 
