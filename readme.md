@@ -1,12 +1,12 @@
 # be markdown notes backend
 
-deployment: https://fromsian.pythonanywhere.com/
+deployment: [https://fromsian.pythonanywhere.com/](https://fromsian.pythonanywhere.com/)
 
-front-end deployment: https://be-markdown-notes.vercel.app/
+front-end deployment: [https://be-markdown-notes.vercel.app/](https://be-markdown-notes.vercel.app/)
 
 This is the back-end. Using django-rest-framework.
 
-the front-end repo is https://github.com/fromSian/be-markdown-notes
+the front-end repo is [https://github.com/fromSian/be-markdown-notes](https://github.com/fromSian/be-markdown-notes)
 
 ## Django + Django REST framework + google-auth-oauthlib + drf-yasg + django-filter + django-redis + DRF API Logger + markdownify
 
@@ -15,7 +15,7 @@ the front-end repo is https://github.com/fromSian/be-markdown-notes
 ### i18n
 
 support English Simplified Chinese Traditional Chinese
-reference: https://www.django-rest-framework.org/topics/internationalization/
+reference: [https://www.django-rest-framework.org/topics/internationalization/](https://www.django-rest-framework.org/topics/internationalization/)
 
 ### handle timezone issues & datetime formatting
 
@@ -94,7 +94,8 @@ Use rest_framework_simplejwt to genrate token and store token in redis
 
 #### sign in with google
 
-my post:https://dev.to/fromsian/integrate-google-oauth2-authentication-into-the-django-rest-framework-39hj
+my post: [https://dev.to/fromsian/integrate-google-oauth2-authentication-into-the-django-rest-framework-39hj
+](https://dev.to/fromsian/integrate-google-oauth2-authentication-into-the-django-rest-framework-39hj)
 
 - google authentication access
 - google authentication callback
@@ -160,7 +161,7 @@ Users can save their own preferences for 'language', 'theme', 'datetime display'
 ### redis to cache token
 
 - in development environment, using local redis
-- in production environment, using redis-cloud: https://redis.io/why-redis-cloud/
+- in production environment, using redis-cloud: [https://redis.io/why-redis-cloud/](https://redis.io/why-redis-cloud/)
 
 ### shedular
 
@@ -173,4 +174,4 @@ Use drf-yasg to generate swagger page.
 
 ## deploy
 
-deploy on https://www.pythonanywhere.com/ platform
+deploy on [https://www.pythonanywhere.com/](https://redis.io/why-redis-cloud/) platform
