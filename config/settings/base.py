@@ -69,6 +69,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "https://fromsian.pythonanywhere.com",
     "https://be-markdown-notes.vercel.app",
+    "https://main--bemarkdownnotes.netlify.app",
 ]
 
 

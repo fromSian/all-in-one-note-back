@@ -10,6 +10,7 @@ ALLOWED_HOSTS = [
     "fromsian.pythonanywhere.com",
     ".vercel.app",
     ".now.sh",
+    "main--bemarkdownnotes.netlify.app",
 ]
 
 CACHES = {
