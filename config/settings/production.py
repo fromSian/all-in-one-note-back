@@ -11,6 +11,7 @@ ALLOWED_HOSTS = [
     ".vercel.app",
     ".now.sh",
     "main--bemarkdownnotes.netlify.app",
+    "bemarkdownnotes.netlify.app",
 ]
 
 CACHES = {
