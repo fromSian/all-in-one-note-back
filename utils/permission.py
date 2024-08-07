@@ -41,7 +41,7 @@ def check_valid(action_time):
     now = datetime.now().timestamp()
     action = int(action_time) / 1000.0
 
-    if action < now - 10:
+    if action < now - 15:
         return False
     return True
 
@@ -53,5 +53,4 @@ class RequestValidPermission(permissions.BasePermission):
             return False
         encrypt = RSAEncryption()
         action = encrypt.decrypt(action_time)
-
         return check_valid(action)
