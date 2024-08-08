@@ -30,33 +30,33 @@ CACHES = {
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "postgres",
-#         "USER": "postgres.hrcpfvwjbsrmgoaivjff",
-#         "PASSWORD": os.environ.get("PGSQL_PWD"),
-#         "HOST": "aws-0-ap-southeast-1.pooler.supabase.com",
-#         "PORT": "6543",
-#     }
-# }
 DATABASES = {
     "default": {
-        "ENGINE": "djongo",
-        "NAME": "notetodos",
-        "ENFORCE_SCHEMA": False,
-        "CLIENT": {
-            "host": "mongodb+srv://fromsian:{0}@cluster0.yvbadfb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0".format(
-                os.environ.get("MONGODB_PWD")
-            ),
-            "port": 27017,
-            "username": "fromsian",
-            "password": os.environ.get("MONGODB_PWD"),
-            "authSource": "notetodos",
-            "authMechanism": "SCRAM-SHA-1",
-        },
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres.hrcpfvwjbsrmgoaivjff",
+        "PASSWORD": os.environ.get("PGSQL_PWD"),
+        "HOST": "aws-0-ap-southeast-1.pooler.supabase.com",
+        "PORT": "6543",
     }
 }
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "djongo",
+#         "NAME": "notetodos",
+#         "ENFORCE_SCHEMA": False,
+#         "CLIENT": {
+#             "host": "mongodb+srv://fromsian:{0}@cluster0.yvbadfb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0".format(
+#                 os.environ.get("MONGODB_PWD")
+#             ),
+#             "port": 27017,
+#             "username": "fromsian",
+#             "password": os.environ.get("MONGODB_PWD"),
+#             "authSource": "notetodos",
+#             "authMechanism": "SCRAM-SHA-1",
+#         },
+#     }
+# }
 
 # DATABASES = {
 #     "default": {
