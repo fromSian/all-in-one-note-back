@@ -67,9 +67,9 @@ DATABASES = {
 
 
 GOOGLE_OAUTH2_REDIRECT_SUCCESS_URL = (
-    "https://be-markdown-notes.vercel.app/google-success/"
+    "https://bemarkdownnotes.netlify.app//google-success/"
 )
-GOOGLE_OAUTH2_REDIRECT_FAIL_URL = "https://be-markdown-notes.vercel.app/google-fail/"
+GOOGLE_OAUTH2_REDIRECT_FAIL_URL = "https://bemarkdownnotes.netlify.app/google-fail/"
 
 
 BASE_BACKEND_URL = "https://fromsian.pythonanywhere.com/"
