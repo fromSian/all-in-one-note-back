@@ -67,7 +67,7 @@ DATABASES = {
 
 
 GOOGLE_OAUTH2_REDIRECT_SUCCESS_URL = (
-    "https://bemarkdownnotes.netlify.app//google-success/"
+    "https://bemarkdownnotes.netlify.app/google-success/"
 )
 GOOGLE_OAUTH2_REDIRECT_FAIL_URL = "https://bemarkdownnotes.netlify.app/google-fail/"
 
