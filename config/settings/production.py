@@ -17,7 +17,7 @@ ALLOWED_HOSTS = [
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://default@redis-16594.c93.us-east-1-3.ec2.redns.redis-cloud.com:16594",
+        "LOCATION": "redis://default:BtLqyZF5YJxkLaipFlpZh295cOFAJGLi@redis-16594.c93.us-east-1-3.ec2.redns.redis-cloud.com:16594",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "DB": "cache-M3BJKAFY",
