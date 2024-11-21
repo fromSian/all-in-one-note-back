@@ -174,4 +174,5 @@ Use drf-yasg to generate swagger page.
 
 ## deploy
 
-deploy on [https://www.pythonanywhere.com/](https://redis.io/why-redis-cloud/) platform
+deploy on [https://www.pythonanywhere.com/](https://www.pythonanywhere.com/) platform
+database on [https://supabase.com/](https://supabase.com/)
