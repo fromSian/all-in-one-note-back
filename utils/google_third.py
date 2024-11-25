@@ -83,16 +83,16 @@ def callback_view(request):
         error = validated_data.get("error")
         state = validated_data.get("state")
         if error is not None:
-            raise ValidationError(error)
+            raise error
             return Response({"message": error}, status=status.HTTP_400_BAD_REQUEST)
         if code is None or state is None:
-            raise ValidationError("Missing code or state")
+            raise "Missing code or state"
             return Response(
                 {"message": "Missing code or state"}, status=status.HTTP_400_BAD_REQUEST
             )
         state = request.session.get("state")
         if not state:
-            raise ValidationError("not valid request")
+            raise "not valid request"
             return Response(
                 {"message": "not valid request"}, status=status.HTTP_400_BAD_REQUEST
             )
